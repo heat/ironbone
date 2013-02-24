@@ -15,6 +15,7 @@ config:
     outputdir: c:/tmp/runner
     package: org.bluewolf.test
     suffix: .java
+    templatedir: ${resolverdir}/another
     templates: 
       - dao.template
       - entity.template

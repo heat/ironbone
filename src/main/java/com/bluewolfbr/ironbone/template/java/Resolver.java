@@ -16,18 +16,23 @@
 package com.bluewolfbr.ironbone.template.java;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import no.tornado.template.Template;
+import no.tornado.template.TemplateException;
 
 public class Resolver {
 
     private Map context;
     private String outputBaseDir = new File("").getAbsolutePath();
+    private String templateDir;
     private List<File> templateFileList = new ArrayList<File>();
 
     public Resolver(Map properties) {
@@ -42,6 +47,12 @@ public class Resolver {
         if (properties.containsKey("outputdir") && properties.get("outputdir") != null) {
             this.outputBaseDir = (String) properties.get("outputdir");
         }
+        if (properties.containsKey("templatedir") && properties.get("templatedir") != null) {
+            try {
+                this.templateDir = complieTemplateDir((String) properties.get("templatedir"));
+            } catch (TemplateException ex) {
+            }
+        }
         if (properties.containsKey("templates") && properties.get("templates") != null) {
             List templateList = (List) properties.get("templates");
             String[] templates = new String[templateList.size()];
@@ -55,18 +66,23 @@ public class Resolver {
     public Resolver() {
         this.context = new HashMap();
         context.put("package", "");
+        try {
+            URL defaultClassFolder = Resolver.class.getResource("Resolver.class");
+            this.templateDir = defaultClassFolder.getPath();
+        } catch (Exception ex) {
+            Logger.getLogger(Resolver.class.getName()).log(Level.SEVERE, null, ex);
+        }
         populateTemplateList(new String[]{"dao.template", "entity.template"});
     }
 
     private void populateTemplateList(String[] templates) {
         templateFileList.clear();
-        try {
-            for (String template : templates) {
-                templateFileList.add(new File(
-                        Resolver.class.getResource(template).toURI()));
+
+        for (String template : templates) {
+            File f = new File(this.templateDir + template);
+            if (f.exists()) {
+                templateFileList.add(f);
             }
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(Resolver.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -96,5 +112,13 @@ public class Resolver {
 
     public Map getContext() {
         return this.context;
+    }
+
+    private String complieTemplateDir(String string) throws TemplateException {
+        Map<String, Object> ctx = new HashMap<String, Object>();
+        ctx.put("resolverdir",
+                this.getClass().getResource("Resolver.class").getPath());
+        Template template = new Template(string, context);
+        return template.render();
     }
 }

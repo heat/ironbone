@@ -1,0 +1,9 @@
+package ${package};
+
+public class ${table.name} {
+    
+    [#list table.columns as column]
+    public String ${column.name}
+    [/#list]
+    
+}
