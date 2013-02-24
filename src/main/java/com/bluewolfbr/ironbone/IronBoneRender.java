@@ -84,7 +84,9 @@ public class IronBoneRender {
         File outputdir = this.templateResolver.getOutputDirectory();
         String filename = this.templateResolver.getFileName(template, data.name);
         Template simpleTemplate = new Template(template, ctx);
+        
         File outputFile = new File(outputdir, filename);
+        System.out.println("write in" + outputFile.toString());
         Writer writer = new FileWriter(outputFile);
         writer.write(simpleTemplate.render());
         writer.flush();

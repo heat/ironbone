@@ -100,13 +100,13 @@ public class DatabaseConfigTest {
     }
     @Test
     public void testInitialize() throws Exception {
-        DatabaseConfig config = new DatabaseConfig(this.getClass().getResource("database.yml"));
+        DatabaseConfig config = new DatabaseConfig(this.getClass().getResource("config.yml"));
         assertEquals("jdbc:hsqldb:mem:data/test", config.getUrl());
     }
     @Test
     public void testGetConnection() throws Exception {
         System.out.println("getConnection");
-        DatabaseConfig instance = new DatabaseConfig(this.getClass().getResource("database.yml"));
+        DatabaseConfig instance = new DatabaseConfig(this.getClass().getResource("config.yml"));
         Connection result = instance.getConnection();
         assertNotNull(result);
     }

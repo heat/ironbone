@@ -1,0 +1,21 @@
+# Database information
+database:
+  url: jdbc:hsqldb:mem:data/test
+  database: 
+  driver: org.hsqldb.jdbcDriver
+  user: sa
+  password:
+  schema:
+  catalog:
+
+#configuration
+config:
+  resolver: 
+    class: com.bluewolfbr.ironbone.template.java.Resolver
+    outputdir: c:/tmp
+    package: org.bluewolf.test
+    suffix: .java
+    templates: 
+      - dao.template
+      - entity.template
+    

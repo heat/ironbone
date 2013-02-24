@@ -17,12 +17,18 @@ package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.template.java.Resolver;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.yaml.snakeyaml.Yaml;
 
 public class IronBoneRenderTest {
 
@@ -56,10 +62,27 @@ public class IronBoneRenderTest {
         int result = instance.render(data);
         assertEquals(expResult, result);
     }
+    @Test
+    public void testRenderResolverConfig() throws Exception {
+        System.out.println("render");
+        Table data = new Table("PRODUTO");
+        data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
+        data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
+        Map properties = (Map) readYamlFile(
+                new File(this.getClass().getResource("config.yml").toURI())).get("config");
+        properties = (Map) properties.get("resolver");
+        IronBoneRender instance = new IronBoneRender(new Resolver(properties));
+        
+        
+        int result = instance.render(data);
+        int expResult = 0;
+        assertEquals(expResult, result);
+    }
 
     /**
      * test the possibility to call render with a new Resolver.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testeRenderResolver() throws Exception {
@@ -80,5 +103,12 @@ public class IronBoneRenderTest {
             }
         });
         assertEquals(expResult, result);
+    }
+
+    private Map readYamlFile(File yamlfile) throws FileNotFoundException {
+        Yaml yaml = new Yaml();
+        InputStream read = new FileInputStream(yamlfile);
+        Map data = (Map) yaml.load(read);
+        return data;
     }
 }

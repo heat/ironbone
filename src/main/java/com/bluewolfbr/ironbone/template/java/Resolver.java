@@ -21,17 +21,51 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Resolver {
 
     private Map context;
-    public Resolver() {
-        this.context = new HashMap();
-        
-        context.put("package", "com.bluewolfbr.out");
+    private String outputBaseDir = new File("").getAbsolutePath();
+    private List<File> templateFileList = new ArrayList<File>();
+
+    public Resolver(Map properties) {
+        this();
+        if (properties.containsKey("package") && properties.get("package") != null) {        
+        context.put("package", properties.get("package"));
+        }
+        if (properties.containsKey("outputdir") && properties.get("outputdir") != null) {
+            this.outputBaseDir = (String) properties.get("outputdir");
+        }
+        if (properties.containsKey("templates") && properties.get("templates") != null) {
+            List templateList = (List) properties.get("templates");
+            String[] templates = new String[templateList.size()];
+            for (int i = 0; i < templateList.size(); i++) {
+                templates[i] = (String) templateList.get(i);
+            } 
+            populateTemplateList(templates);
+        }
     }
 
-    
+    public Resolver() {
+        this.context = new HashMap();
+        context.put("package", "");
+        populateTemplateList(new String[]{"dao.template","entity.template"});
+    }
+
+    private void populateTemplateList(String[] templates) {
+        templateFileList.clear();
+        try {
+            for (String template : templates) {
+                templateFileList.add(new File(
+                        Resolver.class.getResource(template).toURI()));
+            }
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Resolver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public File[] getTemplates() {
         List<File> f = new ArrayList<File>();
         try {
@@ -43,11 +77,11 @@ public class Resolver {
     }
 
     public File getOutputDirectory() {
-        File outputDirectory = new File("c:/tmp/output");
-        outputDirectory.mkdirs();
+        File outputDirectory = new File(this.outputBaseDir);
+        if(!outputDirectory.exists())
+            outputDirectory.mkdirs();
         return outputDirectory;
     }
-
 
     public String getFileName(File template, String name) {
         String templateName = template.getName();
