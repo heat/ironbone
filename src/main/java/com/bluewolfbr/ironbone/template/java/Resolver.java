@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone.template.java;
 
+import com.bluewolfbr.ironbone.utils.PropertiesParser;
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -49,7 +49,8 @@ public class Resolver {
         }
         if (properties.containsKey("templatedir") && properties.get("templatedir") != null) {
             try {
-                this.templateDir = complieTemplateDir((String) properties.get("templatedir"));
+                this.templateDir =  PropertiesParser.parser((String) properties.get("templatedir"), context);
+
             } catch (TemplateException ex) {
             }
         }
