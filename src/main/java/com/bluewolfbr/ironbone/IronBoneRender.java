@@ -35,9 +35,27 @@ public class IronBoneRender {
         this.templateResolver = templateResolver;
     }
 
+    /**
+     * A shortcut when you want call it with another resolver.
+     * @param data
+     * @param resovlerTemplate
+     * @return
+     * @throws Exception 
+     */
+    public int render(Table data, Resolver resovlerTemplate) throws Exception {
+        IronBoneRender render = new IronBoneRender(resovlerTemplate);
+        return render.render(data);
+    }
+    
+    /**
+     * This method start the render process
+     * @param data
+     * @return
+     * @throws Exception 
+     */
     public int render(Table data) throws Exception {
 
-        File[] templates = templateResolver.getTemplates();
+        File[] templates = this.templateResolver.getTemplates();
         List<File> outputFileList = new ArrayList<File>();
         try {
             for (File template : templates) {
@@ -50,12 +68,21 @@ public class IronBoneRender {
         return 0;
     }
 
+    /**
+     * Render individual templates with data
+     * @param template a @code{File} template
+     * @param data the table
+     * @return return a @code{File} that contain render result 
+     * @throws IOException
+     * @throws TemplateException 
+     */
     private File render(File template, Table data) throws IOException, TemplateException {
         Map ctx = new HashMap();
         ctx.put("table", data);
-        ctx.put("package", templateResolver.getSourcePackage());
-        File outputdir = templateResolver.getOutputDirectory();
-        String filename = templateResolver.getFileName(template, data.name);
+        //merge additional context information
+        ctx.putAll(this.templateResolver.getContext());
+        File outputdir = this.templateResolver.getOutputDirectory();
+        String filename = this.templateResolver.getFileName(template, data.name);
         Template simpleTemplate = new Template(template, ctx);
         File outputFile = new File(outputdir, filename);
         Writer writer = new FileWriter(outputFile);

@@ -19,9 +19,19 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Resolver {
 
+    private Map context;
+    public Resolver() {
+        this.context = new HashMap();
+        
+        context.put("package", "com.bluewolfbr.out");
+    }
+
+    
     public File[] getTemplates() {
         List<File> f = new ArrayList<File>();
         try {
@@ -45,7 +55,7 @@ public class Resolver {
         return fileName;
     }
 
-    public Object getSourcePackage() {
-        return "test.output";
+    public Map getContext() {
+        return this.context;
     }
 }
