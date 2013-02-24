@@ -5,8 +5,8 @@ public class Column {
         STRING, INTEGER, DOUBLE, BIGDECIMAL, BOOLEAN, LONG, FLOAT
     }
 
-        String name;
-        COLUMN_TYPE type;
+        public String name;
+        public COLUMN_TYPE type;
         
     public Column(String name, COLUMN_TYPE type) {
         this.name = name;

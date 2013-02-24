@@ -5,8 +5,8 @@ import java.util.Collection;
 
 public class Table {
 
-    String name;
-    Collection<Column> columns;
+    public String name;
+    public Collection<Column> columns;
     
     public Table(String name) {
         this.name = name;
