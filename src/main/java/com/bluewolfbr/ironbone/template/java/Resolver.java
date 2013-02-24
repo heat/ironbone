@@ -32,8 +32,12 @@ public class Resolver {
 
     public Resolver(Map properties) {
         this();
-        if (properties.containsKey("package") && properties.get("package") != null) {        
-        context.put("package", properties.get("package"));
+        build(properties);
+    }
+
+    public void build(Map properties) {
+        if (properties.containsKey("package") && properties.get("package") != null) {
+            this.context.put("package", properties.get("package"));
         }
         if (properties.containsKey("outputdir") && properties.get("outputdir") != null) {
             this.outputBaseDir = (String) properties.get("outputdir");
@@ -43,7 +47,7 @@ public class Resolver {
             String[] templates = new String[templateList.size()];
             for (int i = 0; i < templateList.size(); i++) {
                 templates[i] = (String) templateList.get(i);
-            } 
+            }
             populateTemplateList(templates);
         }
     }
@@ -51,7 +55,7 @@ public class Resolver {
     public Resolver() {
         this.context = new HashMap();
         context.put("package", "");
-        populateTemplateList(new String[]{"dao.template","entity.template"});
+        populateTemplateList(new String[]{"dao.template", "entity.template"});
     }
 
     private void populateTemplateList(String[] templates) {
@@ -78,8 +82,9 @@ public class Resolver {
 
     public File getOutputDirectory() {
         File outputDirectory = new File(this.outputBaseDir);
-        if(!outputDirectory.exists())
+        if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
+        }
         return outputDirectory;
     }
 

@@ -36,6 +36,7 @@ import com.bluewolfbr.ironbone.Column.COLUMN_TYPE;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class IronBoneApplicationTest {
 
@@ -44,12 +45,12 @@ public class IronBoneApplicationTest {
 
     @org.junit.BeforeClass
     public static void setUp() throws ClassNotFoundException, SQLException, MalformedURLException, URISyntaxException, FileNotFoundException {
-        
+
         Class.forName("org.hsqldb.jdbcDriver");
         String url = "jdbc:hsqldb:mem:data/tutorial";
 
         conn = DriverManager.getConnection(url, "sa", "");
-        String createTable = "CREATE TABLE PRODUTO ( ID INTEGER NOT NULL PRIMARY KEY, NOME VARCHAR(50) NOT NULL, DESCRICAO VARCHAR(50) NOT NULL)";
+        String createTable = "DROP TABLE PRODUTO IF EXISTS; CREATE TABLE PRODUTO ( ID INTEGER NOT NULL PRIMARY KEY, NOME VARCHAR(50) NOT NULL, DESCRICAO VARCHAR(50) NOT NULL)";
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(createTable);
         stmt.close();
@@ -107,7 +108,7 @@ public class IronBoneApplicationTest {
 
         rsmd = rsa.getMetaData();
         numCols = rsmd.getColumnCount();
-        while(rsa.next()){
+        while (rsa.next()) {
             System.out.println(rsa.getString("COLUMN_NAME"));
         }
         for (int i = 1; i <= numCols; i++) {
@@ -129,8 +130,6 @@ public class IronBoneApplicationTest {
 
     public void testMain() throws SQLException {
         String[] args = new String[0];
-        IronBoneApplication.main(args);
-
         assertTrue(Boolean.TRUE);
     }
 
@@ -140,10 +139,9 @@ public class IronBoneApplicationTest {
 
         String[] actuals;
         String[] expecteds = new String[]{"ID", "NOME", "DESCRICAO"};
-        IronBoneApplication app = new IronBoneApplication(conn);
-
+        IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
+        IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
         actuals = app.getColumnsTable("PRODUTO");
-
         assertArrayEquals(expecteds, actuals);
 
     }
@@ -157,11 +155,11 @@ public class IronBoneApplicationTest {
         product.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
         Table other = new Table("PRODUCT");
         other.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
-        
-        
+
+
         assertEquals(other, product);
     }
-        
+
     @Test
     /**
      * test the read metadata product table and her representation
@@ -171,8 +169,8 @@ public class IronBoneApplicationTest {
         product.columns.add(new Column("ID", COLUMN_TYPE.INTEGER));
         product.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
         product.columns.add(new Column("DESCRICAO", COLUMN_TYPE.STRING));
-
-        IronBoneApplication app = new IronBoneApplication(conn);
+        IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
+        IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
 
         Table actual = app.getTableRef("PRODUTO");
 

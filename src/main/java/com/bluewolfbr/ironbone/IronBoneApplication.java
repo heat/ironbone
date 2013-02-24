@@ -26,18 +26,18 @@ import java.util.List;
 import com.bluewolfbr.ironbone.utils.TransformSQLType;
 
 public class IronBoneApplication {
+
     private Connection conn;
+    private IronBoneRender renderEngine;
 
-    public IronBoneApplication(Connection conn) {
+    public IronBoneApplication(Connection conn, IronBoneRender renderEngine) {
         this.conn = conn;
+        this.renderEngine = renderEngine;
     }
-    
-    /**
-     * @param args
-     * @throws SQLException
-     */
-    public static void main(String[] args) throws SQLException {
 
+    public void run(String tableName) throws Exception {
+        Table table = getTableRef(tableName);
+        renderEngine.render(table);
     }
 
     public Table getTableRef(String tablename) throws SQLException {
@@ -48,10 +48,10 @@ public class IronBoneApplication {
 
     /**
      * Retrieve the columns into collection of Columns <br>
-     * 
+     *
      * @see <a
-     *      href="http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/getstart/mapping.html">JDBC
-     *      Mapping</a>
+     * href="http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/getstart/mapping.html">JDBC
+     * Mapping</a>
      * @param tablename
      * @return Collection of mapped column type
      * @throws SQLException
@@ -62,7 +62,7 @@ public class IronBoneApplication {
 
         DatabaseMetaData metadata = conn.getMetaData();
 
-        ResultSet rs = metadata.getColumns(null,null, tablename, null);
+        ResultSet rs = metadata.getColumns(null, null, tablename, null);
 
         while (rs.next()) {
             columns.add(resultsetToColumn(rs));
@@ -81,7 +81,7 @@ public class IronBoneApplication {
 
     /**
      * read the columns name of the table. <br>
-     * 
+     *
      * @see DatabaseMetaData#getColumns(String, String, String, String)
      * @param table
      * @return
@@ -105,6 +105,6 @@ public class IronBoneApplication {
             columns.add(rs.getString("COLUMN_NAME"));
         }
 
-        return columns.toArray(new String[] {});
+        return columns.toArray(new String[]{});
     }
 }
