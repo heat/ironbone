@@ -7,9 +7,12 @@ public class Table {
 
     public String name;
     public Collection<Column> columns;
+    //TODO chave composta
+    public Column primaryKey;
     
     public Table(String name) {
         this.name = name;
+        this.primaryKey = new Column("", Column.COLUMN_TYPE.STRING);
         columns = new ArrayList<Column>();
     }
 

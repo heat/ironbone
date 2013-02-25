@@ -2,7 +2,16 @@ package com.bluewolfbr.ironbone;
 
 public class Column {
     public enum COLUMN_TYPE{
-        STRING, INTEGER, DOUBLE, BIGDECIMAL, BOOLEAN, LONG, FLOAT
+        STRING("String"), INTEGER("Integer"), DOUBLE("Double"), BIGDECIMAL("BigDecimal"), BOOLEAN("Boolean"), LONG("Long"), FLOAT("Float");
+        
+        String type;
+        COLUMN_TYPE(String type)  {
+            this.type = type;
+        }
+        
+        public String toString() {
+            return this.type;
+        }
     }
 
         public String name;
