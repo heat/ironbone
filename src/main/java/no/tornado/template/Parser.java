@@ -9,8 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser implements Serializable {
-    enum TRANSFORMATIONS { SIZE, FORMAT }
 
+    enum TRANSFORMATIONS { SIZE, FORMAT}
+    enum STRING_TRANSFORMATIONS { CAMELCASE, METHOD_NAME, UPPERCASE, LOWERCASE};
     public static final String PATH_SEPARATOR = "\\.(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list]", Pattern.DOTALL);
@@ -223,9 +224,33 @@ public class Parser implements Serializable {
                     throw new TemplateException("No arguments given to format transformation:" + transformExpression, template);
                 if (object instanceof Date || object instanceof java.sql.Date || object instanceof java.sql.Time)
                     return new SimpleDateFormat(args).format(object);
-
+                if (object instanceof String )
+                    return this.formatString( (String) object,  args);
             default: throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
         }
+    }
+
+    private Object formatString(String content, String transformExpression) throws TemplateException {
+        STRING_TRANSFORMATIONS transform = STRING_TRANSFORMATIONS.valueOf(transformExpression.toUpperCase());
+        
+        switch(transform) {
+            case CAMELCASE:
+                StringBuilder sb = new StringBuilder();
+                String[] trunks = content.split("_");
+                for(String trunk : trunks) {
+                    sb.append(String.valueOf(trunk.charAt(0)).toUpperCase());
+                    sb.append(trunk.substring(1).toLowerCase());
+                }
+                return sb.toString();
+            case LOWERCASE:
+                return content.toLowerCase();
+            case UPPERCASE:
+                return content.toUpperCase();
+            case METHOD_NAME:   
+                
+            default: throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
+        }
+        
     }
 
     private String convertPropertyToGetter(String property) {
