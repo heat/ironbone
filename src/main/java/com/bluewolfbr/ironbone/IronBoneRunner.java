@@ -15,17 +15,12 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.template.java.Resolver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.sql.SQLException;
+import java.net.URL;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 public class IronBoneRunner {
@@ -42,7 +37,14 @@ public class IronBoneRunner {
         File yamlFile = null;
 
         if (yamlConfigFile != null && !yamlConfigFile.isEmpty()) {
-            yamlFile = new File(new URI(yamlConfigFile));
+            //try it from simple file name path
+            File _yamlFile = new File(yamlConfigFile);
+            if (_yamlFile.exists()) {
+                yamlFile = _yamlFile.getAbsoluteFile();
+            } else {
+                System.out.println(yamlConfigFile);
+                yamlFile = new File(new URL(yamlConfigFile).toURI());
+            }
             if (!yamlFile.exists()) {
                 throw new RuntimeException("arquivo de configuração faltando");
             }
@@ -54,7 +56,7 @@ public class IronBoneRunner {
         DatabaseConfig dbconfig;
         try {
             dbconfig = new DatabaseConfig(yamlFile);
-            Resolver templateResolver = getResolver(yamlFile);
+            IResolver templateResolver = getResolver(yamlFile);
             IronBoneRender render = new IronBoneRender(templateResolver);
             IronBoneApplication app = new IronBoneApplication(dbconfig.getConnection(), render);
             app.run(tableName);
@@ -69,14 +71,14 @@ public class IronBoneRunner {
      * @param yamlFile
      * @return
      */
-    private static Resolver getResolver(File yamlFile) throws FileNotFoundException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private static IResolver getResolver(File yamlFile) throws FileNotFoundException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Yaml yaml = new Yaml();
         InputStream read = new FileInputStream(yamlFile);
         Map data = (Map) yaml.load(read);
         Map resolverProperties = (Map) ((Map) data.get("config")).get("resolver");
         String className = (String) resolverProperties.get("class");
-        Resolver resolver = null;
-        resolver = (Resolver) Class.forName(className).newInstance();
+        IResolver resolver = null;
+        resolver = (IResolver) Class.forName(className).newInstance();
         resolver.build(resolverProperties);
 
         return resolver;

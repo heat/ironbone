@@ -15,6 +15,7 @@
  */
 package com.bluewolfbr.ironbone.template.java;
 
+import com.bluewolfbr.ironbone.IResolver;
 import com.bluewolfbr.ironbone.utils.PropertiesParser;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -25,22 +26,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import no.tornado.template.Template;
 import no.tornado.template.TemplateException;
 
-public class Resolver {
+public class JavaResolver implements IResolver {
 
     private Map context;
     private String outputBaseDir = new File("").getAbsolutePath();
     private String templateDir;
     private List<File> templateFileList = new ArrayList<File>();
 
-    public Resolver(Map properties) {
-        this();
-        build(properties);
+    public JavaResolver() {
+        this.context = new HashMap();
+        context.put("package", "");
+        try {
+            URL defaultClassFolder = this.getClass().getResource("Resolver.class");
+            this.templateDir = defaultClassFolder.getPath();
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        populateTemplateList(new String[]{"dao.template", "entity.template"});
     }
 
-    public void build(Map properties) {
+    public static JavaResolver getJavaResolver(Map properties) {
+        JavaResolver instance = new JavaResolver();
+        instance.build(properties);
+        return instance;
+    }
+
+    @Override
+    public JavaResolver build(Map properties) {
         if (properties.containsKey("package") && properties.get("package") != null) {
             this.context.put("package", properties.get("package"));
         }
@@ -49,7 +63,7 @@ public class Resolver {
         }
         if (properties.containsKey("templatedir") && properties.get("templatedir") != null) {
             try {
-                this.templateDir =  PropertiesParser.parser((String) properties.get("templatedir"), context);
+                this.templateDir = PropertiesParser.parser((String) properties.get("templatedir"), context);
 
             } catch (TemplateException ex) {
             }
@@ -62,18 +76,8 @@ public class Resolver {
             }
             populateTemplateList(templates);
         }
-    }
-
-    public Resolver() {
-        this.context = new HashMap();
-        context.put("package", "");
-        try {
-            URL defaultClassFolder = Resolver.class.getResource("Resolver.class");
-            this.templateDir = defaultClassFolder.getPath();
-        } catch (Exception ex) {
-            Logger.getLogger(Resolver.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        populateTemplateList(new String[]{"dao.template", "entity.template"});
+        
+        return this;
     }
 
     private void populateTemplateList(String[] templates) {
@@ -87,16 +91,18 @@ public class Resolver {
         }
     }
 
+    @Override
     public File[] getTemplates() {
         List<File> f = new ArrayList<File>();
         try {
-            f.add(new File(Resolver.class.getResource("entity.template").toURI()));
-            f.add(new File(Resolver.class.getResource("dao.template").toURI()));
+            f.add(new File(this.getClass().getResource("entity.template").toURI()));
+            f.add(new File(this.getClass().getResource("dao.template").toURI()));
         } catch (URISyntaxException e) {
         }
         return f.toArray(new File[]{});
     }
 
+    @Override
     public File getOutputDirectory() {
         File outputDirectory = new File(this.outputBaseDir);
         if (!outputDirectory.exists()) {
@@ -105,21 +111,16 @@ public class Resolver {
         return outputDirectory;
     }
 
+    @Override
     public String getFileName(File template, String name) {
         String templateName = template.getName();
         String fileName = templateName + name + ".java";
         return fileName;
     }
 
+    @Override
     public Map getContext() {
         return this.context;
     }
 
-    private String complieTemplateDir(String string) throws TemplateException {
-        Map<String, Object> ctx = new HashMap<String, Object>();
-        ctx.put("resolverdir",
-                this.getClass().getResource("Resolver.class").getPath());
-        Template template = new Template(string, context);
-        return template.render();
-    }
 }
