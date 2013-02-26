@@ -15,7 +15,6 @@
  */
 package com.bluewolfbr.ironbone;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -33,9 +32,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.bluewolfbr.ironbone.Column.COLUMN_TYPE;
-import com.bluewolfbr.ironbone.template.java.Resolver;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.util.HashSet;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -55,20 +54,6 @@ public class IronBoneApplicationTest {
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(createTable);
         stmt.close();
-        /*
-         String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-         String connectionURL = IronBoneApplicationTest.connectionURL + ";create=true";
-        
-
-         Class.forName(driver);
-         if (conn != null) {
-         return;
-         }
-         conn = DriverManager.getConnection(connectionURL);
-         Statement stmt = conn.createStatement();
-         stmt.executeUpdate(createTable);
-         stmt.close();
-         * */
     }
 
     @org.junit.AfterClass
@@ -135,19 +120,6 @@ public class IronBoneApplicationTest {
     }
 
     @Test
-    @Deprecated
-    public void testGetColumns() throws SQLException {
-
-        String[] actuals;
-        String[] expecteds = new String[]{"ID", "NOME", "DESCRICAO"};
-        IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
-        IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
-        actuals = app.getColumnsTable("PRODUTO");
-        assertArrayEquals(expecteds, actuals);
-
-    }
-
-    @Test
     public void testePrimaryKey() throws SQLException {
         IronBoneRender render = Mockito.mock(IronBoneRender.class);
         IronBoneApplication app = new IronBoneApplication(conn, render);
@@ -165,9 +137,9 @@ public class IronBoneApplicationTest {
     @Test
     public void testTableNameComparison() {
         Table product = new Table("ProducT");
-        product.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
+        product.primaryKey = new Column("NoMe", COLUMN_TYPE.STRING);
         Table other = new Table("PRODUCT");
-        other.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
+        other.primaryKey = new Column("NOME", COLUMN_TYPE.STRING);
 
 
         assertEquals(other, product);
@@ -179,7 +151,9 @@ public class IronBoneApplicationTest {
      */
     public void testGetTableRef() throws SQLException, CloneNotSupportedException {
         Table product = new Table("PRODUTO");
-        product.columns.add(new Column("ID", COLUMN_TYPE.INTEGER));
+        product.primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
+        product.columns.add(product.primaryKey);
+        
         product.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
         product.columns.add(new Column("DESCRICAO", COLUMN_TYPE.STRING));
         IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
@@ -190,7 +164,7 @@ public class IronBoneApplicationTest {
         assertEquals(product, actual);
 
         Collection<Column> store = actual.columns;
-        actual.columns = new ArrayList<Column>();
+        actual.columns = new HashSet<Column>();
         for (Column c : product.columns) {
             Column columnClone = c.clone();
             actual.columns.add(columnClone);

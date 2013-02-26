@@ -39,7 +39,7 @@ public class JavaResolver implements IResolver {
         this.context = new HashMap();
         context.put("package", "");
         try {
-            URL defaultClassFolder = this.getClass().getResource("Resolver.class");
+            URL defaultClassFolder = this.getClass().getResource("JavaResolver.class");
             this.templateDir = defaultClassFolder.getPath();
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -95,8 +95,13 @@ public class JavaResolver implements IResolver {
     public File[] getTemplates() {
         List<File> f = new ArrayList<File>();
         try {
-            f.add(new File(this.getClass().getResource("entity.template").toURI()));
-            f.add(new File(this.getClass().getResource("dao.template").toURI()));
+            URL url = JavaResolver.class.getResource("entity.template");
+            
+            File file = new File(url.toURI());
+            f.add(file);
+            url = JavaResolver.class.getResource("dao.template");
+            file = new File(url.toURI());
+            f.add(file);
         } catch (URISyntaxException e) {
         }
         return f.toArray(new File[]{});

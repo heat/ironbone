@@ -15,12 +15,11 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.template.java.Resolver;
+import com.bluewolfbr.ironbone.template.java.JavaResolver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -55,9 +54,11 @@ public class IronBoneRenderTest {
     public void testRender() throws Exception {
         System.out.println("render");
         Table data = new Table("PRODUTO");
+        data.primaryKey = new Column("ID", Column.COLUMN_TYPE.INTEGER);
+        data.columns.add(data.primaryKey);
         data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
         data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
-        IronBoneRender instance = new IronBoneRender(new Resolver());
+        IronBoneRender instance = new IronBoneRender(new JavaResolver());
         int expResult = 0;
         int result = instance.render(data);
         assertEquals(expResult, result);
@@ -65,13 +66,15 @@ public class IronBoneRenderTest {
     @Test
     public void testRenderResolverConfig() throws Exception {
         System.out.println("render");
-        Table data = new Table("PRODUTO");
-        data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
-        data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
+        Table data = new Table("PRODUCT_MARVEN");
+        data.primaryKey = new Column("ID", Column.COLUMN_TYPE.LONG);
+        data.columns.add(data.primaryKey);
+        data.columns.add(new Column("NAME", Column.COLUMN_TYPE.STRING));
+        data.columns.add(new Column("DESCRIPTION", Column.COLUMN_TYPE.STRING));
         Map properties = (Map) readYamlFile(
                 new File(this.getClass().getResource("config.yml").toURI())).get("config");
         properties = (Map) properties.get("resolver");
-        IronBoneRender instance = new IronBoneRender(new Resolver(properties));
+        IronBoneRender instance = new IronBoneRender(new JavaResolver().build(properties));
         
         
         int result = instance.render(data);
@@ -88,13 +91,16 @@ public class IronBoneRenderTest {
     public void testeRenderResolver() throws Exception {
         System.out.println("render");
         Table data = new Table("PRODUTO");
+        data.primaryKey = new Column("ID", Column.COLUMN_TYPE.LONG);
         data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
         data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
-        IronBoneRender instance = new IronBoneRender(new Resolver());
+        IronBoneRender instance = new IronBoneRender(new JavaResolver());
 
 
         int expResult = 0;
-        int result = instance.render(data, new Resolver() {
+        
+        int result = instance.render(data, new JavaResolver() {
+
             @Override
             public File getOutputDirectory() {
                 File outputDirectory = new File("c:/tmp/test/new/output");

@@ -61,11 +61,7 @@ public class IronBoneRunnerTest {
     @After
     public void tearDown() {
     }
-
-    /**
-     * Test of main method, of class IronBoneRunner.
-     */
-    @Test
+    
     public void testMain() throws Exception {
         System.out.println("main");
         String[] args = new String[]{this.getClass().getResource("configIronBoneRunner.yml").toString(), "PRODUTO"};

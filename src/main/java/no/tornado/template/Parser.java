@@ -65,7 +65,10 @@ public class Parser implements Serializable {
         else if (listObject instanceof Object[]) {
             list = new ArrayList();
             list.addAll(Arrays.asList((Object[])listObject));
-        } else
+        } else if(listObject instanceof Collection){
+            list = new ArrayList();
+            list.addAll((Collection) listObject);
+        }else
             throw new TemplateException("Trying to iterate over property " + listProperty + " which is not a list or array", template);
 
         for (Object object : list) {

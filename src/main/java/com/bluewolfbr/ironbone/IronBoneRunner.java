@@ -78,7 +78,8 @@ public class IronBoneRunner {
         Map resolverProperties = (Map) ((Map) data.get("config")).get("resolver");
         String className = (String) resolverProperties.get("class");
         IResolver resolver = null;
-        resolver = (IResolver) Class.forName(className).newInstance();
+        Object obj = Class.forName(className).newInstance();
+        resolver = (IResolver) obj;
         resolver.build(resolverProperties);
 
         return resolver;

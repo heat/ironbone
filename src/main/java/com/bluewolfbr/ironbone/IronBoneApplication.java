@@ -53,7 +53,7 @@ public class IronBoneApplication {
                  metadata = conn.getMetaData();
         ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);
         
-        rs.next();
+        if(rs.next()){
         String columnName = rs.getString("COLUMN_NAME");
         
         if (!rs.isLast())
@@ -63,6 +63,8 @@ public class IronBoneApplication {
         rs.next();
         column = resultsetToColumn(rs);
         return column;
+        }
+        throw new SQLException("Primary key not found.");
     }
     /**
      * Retrieve the columns into collection of Columns <br>
