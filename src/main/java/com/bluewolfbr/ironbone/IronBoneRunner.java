@@ -17,9 +17,11 @@ package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.utils.ContextVisitor;
 import com.bluewolfbr.ironbone.utils.IVisitor;
+import com.bluewolfbr.ironbone.utils.PropertiesParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -29,6 +31,7 @@ public class IronBoneRunner {
     IVisitor contextVisitor = new ContextVisitor();
 
     public void run(IronBoneConfiguration configuration, String tableName) throws Exception {
+        System.out.println("runnig at " + new File("null").getAbsoluteFile().getParent());
         //start visiting de IBApplication
         IronBoneApplication.getEmptyInstance().accept(contextVisitor);
         //Recover the resolver class and visit it
@@ -37,6 +40,10 @@ public class IronBoneRunner {
 
         //after all visits parse the configuration
         configuration.parser();
+        Yaml yaml = new Yaml();
+        System.out.println(Arrays.toString(PropertiesParser.applicationContext.keySet().toArray()));
+        System.out.println(Arrays.toString(PropertiesParser.applicationContext.values().toArray()));
+        System.out.println("Current configuration:\n" + yaml.dumpAs(configuration, Tag.YAML, FlowStyle.BLOCK));        
         //after that initialize it
         resolverDriver.build(configuration.config.resolver);
 
@@ -78,7 +85,6 @@ public class IronBoneRunner {
         }
         is = new FileInputStream(yamlFile);
         configuration = yaml.loadAs(is, IronBoneConfiguration.class);
-        System.out.println("Current configuration:\n" + yaml.dumpAs(configuration, Tag.YAML, FlowStyle.BLOCK));
         runner.run(configuration, tableName);
     }
 

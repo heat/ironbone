@@ -84,7 +84,8 @@ public class Parser implements Serializable {
         Matcher matcher = VARIABLE_PATTERN.matcher(partSource);
         StringBuffer sb = new StringBuffer();
         while (matcher.find())
-            matcher.appendReplacement(sb, convert(lookupContext(matcher.group(1))));
+            matcher.appendReplacement(sb, 
+                    matcher.quoteReplacement(convert(lookupContext(matcher.group(1)))));
         matcher.appendTail(sb);
         return sb.toString();
     }

@@ -20,6 +20,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import no.tornado.template.Template;
+import no.tornado.template.TemplateException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -66,28 +70,39 @@ public class YamlConfigTest {
         IronBoneConfiguration config = yamlParser.loadAs(is, IronBoneConfiguration.class);
 
         is.close();
-        
+
         assertNotNull(config);
     }
+
     @Test
     public void testDumpConfig() throws Exception {
         File tmpFile = File.createTempFile("config", ".yml");
-        
+
         Writer outputFile = new FileWriter(tmpFile);
-        
+
         IronBoneConfiguration config = new IronBoneConfiguration();
-        config.config.resolver.templates = new String[]{"entity.template","dao.template","something.template"};
+        config.config.resolver.templates = new String[]{"entity.template", "dao.template", "something.template"};
         Yaml yaml = new Yaml();
-        
+
         String outputContent = yaml.dumpAs(config, Tag.YAML, DumperOptions.FlowStyle.BLOCK);
         outputFile.write(outputContent);
-        
+
         outputFile.close();
-        
+
         System.out.println(tmpFile.getAbsoluteFile());
-        yaml =  new Yaml();
+        yaml = new Yaml();
         IronBoneConfiguration parsed = yaml.loadAs(outputContent, IronBoneConfiguration.class);
         assertNotNull(parsed);
         assertTrue(true);
+    }
+
+    @Test
+    public void testParserDirectoryPropertie() throws TemplateException {
+        Template template;
+        Map ctx = new HashMap();
+        ctx.put("basedir", new File("null").getAbsolutePath());
+        template = new Template("${basedir}", ctx);
+
+        assertEquals(new File("null").getAbsolutePath(), template.render());
     }
 }

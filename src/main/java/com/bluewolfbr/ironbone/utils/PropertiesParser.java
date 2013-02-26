@@ -21,7 +21,7 @@ import no.tornado.template.Template;
 import no.tornado.template.TemplateException;
 
 public class PropertiesParser {
-    private static final Map applicationContext = new HashMap();
+    public static final Map applicationContext = new HashMap();
     {
         
     }

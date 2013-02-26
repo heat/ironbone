@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class JavaResolver implements IResolver {
 
     private Map context;
     private String outputBaseDir = new File("").getAbsolutePath();
-    private String templateDir;
+    private String templateDir = "";
     private List<File> templateFileList = new ArrayList<File>();
 
     public JavaResolver() {
@@ -46,7 +47,6 @@ public class JavaResolver implements IResolver {
         context.put("package", "");
         try {
             URL defaultClassFolder = this.getClass().getResource("JavaResolver.class");
-            this.templateDir = defaultClassFolder.getPath();
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -57,6 +57,8 @@ public class JavaResolver implements IResolver {
         this.context.put("sourcepackage", resolverConfig.sourcepackage);
         this.context.put("outputdir", resolverConfig.outputdir);
         this.context.put("templatedir", resolverConfig.templatedir);
+        this.templateDir = resolverConfig.templatedir;
+        this.outputBaseDir = resolverConfig.outputdir;
 
         populateTemplateList(resolverConfig.templates);
         return this;
@@ -64,13 +66,18 @@ public class JavaResolver implements IResolver {
 
     private void populateTemplateList(String[] templates) {
         templateFileList.clear();
-
+        File templateDir = new File(this.templateDir);
+        System.out.println("template directory lookup " + templateDir.getPath());
         for (String template : templates) {
-            File f = new File(this.templateDir + template);
+            
+            File f = new File(templateDir, template);
+            System.out.println("seeking for template " + f);
+            System.out.println("did you find - " + f.exists());
             if (f.exists()) {
                 templateFileList.add(f);
             }
         }
+        System.out.println("loaded templates : " + Arrays.toString(this.templateFileList.toArray()));
     }
 
     @Override

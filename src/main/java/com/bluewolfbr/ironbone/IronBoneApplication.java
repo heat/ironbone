@@ -119,7 +119,7 @@ public class IronBoneApplication implements IVisitable {
         final List<String> properties = new ArrayList<String>();
         properties.add(
                 "basedir:"
-                + new File("null").getAbsoluteFile().getParentFile().getParent());
+                + new File("null").getAbsoluteFile().getParentFile().getPath());
 
         IVisitor.IContextData contextData = new IVisitor.IContextData() {
             @Override
