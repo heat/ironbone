@@ -3,7 +3,16 @@ package ${package};
 public class ${table.name} {
     
     [#list table.columns as column]
-    public String ${column.name}
+    public String ${column.name};
+    [/#list]
+    
+    [#list table.columns as column]
+    public String get${column.name}(){
+        return this.${column.name};
+    }
+    public void set${column.name}(String ${column.name}){
+        this.${column.name} = ${column.name};
+    }
     [/#list]
     
 }

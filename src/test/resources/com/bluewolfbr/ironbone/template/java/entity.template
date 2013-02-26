@@ -1,9 +1,18 @@
 package ${package};
 
-public class ${table.name} {
+public class ${table.name?format("camelcase")} {
     
-    [#list table.columns as column]
-    public String ${column.name}
-    [/#list]
+[#list table.columns as column]
+    public AA ${column.type} ${column.name};
+[/#list]
+    
+[#list table.columns as column]
+    public ${column.type} get${column.name}(){
+        return this.${column.name};
+    }
+    public void set${column.name}(${column.type} ${column.name}){
+        this.${column.name} = ${column.name};
+    }
+[/#list]
     
 }

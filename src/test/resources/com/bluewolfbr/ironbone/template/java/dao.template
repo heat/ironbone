@@ -1,0 +1,10 @@
+package ${package};
+
+
+public interface ${table.name}Dao {
+  Set<${table.name}> findAll();
+  
+    @SqlQuery(SELECT [#list table.columns as column] ${column.name}, [/#list] from ${table.name} where ${table.name}.${table.primaryKey.name} = :${table.primaryKey.name} )  
+    @Mapper(${table.name}Mapper.Class})
+  ${table.name} find(@Bind("${table.primaryKey.name}") ${table.primaryKey.type} ${table.primaryKey.name});
+}

@@ -1,21 +1,21 @@
-# Database information
-database:
-  url: jdbc:hsqldb:mem:data/test
-  database: 
-  driver: org.hsqldb.jdbcDriver
-  user: sa
-  password:
-  schema:
-  catalog:
-
-#configuration
+!!yaml
 config:
-  resolver: 
-    class: com.bluewolfbr.ironbone.template.java.Resolver
-    outputdir: c:/tmp
-    package: org.bluewolf.test
+  resolver:
+    driver: com.bluewolfbr.ironbone.template.java.JavaResolver
+    outputdir: ${basedir}/output
+    sourcepackage: org.bluewolf.test
     suffix: .java
-    templates: 
-      - dao.template
-      - entity.template
+    templatedir: ${basedir}/templates
+    templates:
+    - entity.template
+    - dao.template
+    - something.template
+database:
+  catalog: null
+  database: null
+  driver: org.hsqldb.jdbcDriver
+  password: null
+  schema: null
+  url: jdbc:hsqldb:mem:data/test
+  user: sa
     
