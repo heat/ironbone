@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone;
+package com.bluewolfbr.ironbone.utils;
 
-import com.bluewolfbr.ironbone.utils.IVisitable;
-import java.io.File;
-import java.util.Map;
-
-
-public interface IResolver<T extends IResolver> extends IVisitable {
-    public T build(IronBoneConfiguration.ResolverConfig resolverConfig);
-    public File[] getTemplates();
-    public File getOutputDirectory();
-    public String getFileName(File template, String name);
-    public Map getContext();
+public interface IVisitor {
+    public interface IContextData extends Iterable<String>{
+        
+    }
+    public void visit(IContextData contextData);
 }

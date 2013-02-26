@@ -15,26 +15,27 @@
  */
 package com.bluewolfbr.ironbone.utils;
 
-import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 import no.tornado.template.Template;
 import no.tornado.template.TemplateException;
 
-/**
- *
- * @author OnezinoGabriel
- */
 public class PropertiesParser {
-    Map applicationContext = new HashMap();
+    private static final Map applicationContext = new HashMap();
     {
-        //add basedir is where the application run.
-        File f = new File("Null");
-        this.applicationContext.put("basedir", f.getAbsolutePath());
         
     }
+    
+    public static String parser(String propertie) throws TemplateException {
+        return parser(propertie, applicationContext);
+    }
+    @Deprecated
     public static String parser(String propertie, Map context) throws TemplateException {
-        Template template = new Template(propertie, context);
+        Template template = new Template(propertie, PropertiesParser.applicationContext);
         return template.render();
+    }
+
+    public static void  addContextProperties(String key, String value) {
+        PropertiesParser.applicationContext.put(key,value);
     }
 }

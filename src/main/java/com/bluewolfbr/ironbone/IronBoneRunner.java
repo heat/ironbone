@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.utils.ContextVisitor;
+import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,6 +27,31 @@ import org.yaml.snakeyaml.Yaml;
 
 public class IronBoneRunner {
 
+    IVisitor contextVisitor = new ContextVisitor();
+
+    public void run(IronBoneConfiguration configuration, String tableName) throws Exception {
+        //start visiting de IBApplication
+        IronBoneApplication.getEmptyInstance().accept(contextVisitor);
+        //Recover the resolver class and visit it
+        IResolver resolverDriver = loadResolverDriver(configuration.config.resolver.driver);
+        resolverDriver.accept(contextVisitor);
+
+        //after all visits parse the configuration
+        configuration.parser();
+        //after that initialize it
+        resolverDriver.build(configuration.config.resolver);
+
+
+        DatabaseConfig dbconfig = new DatabaseConfig(configuration);
+
+
+        IronBoneRender render = new IronBoneRender(resolverDriver);
+
+        IronBoneApplication app = new IronBoneApplication(dbconfig, render);
+
+        app.run(tableName);
+    }
+
     public static void main(String[] args) throws Exception {
         String yamlConfigFile = "";
         String tableName = "";
@@ -34,54 +61,25 @@ public class IronBoneRunner {
         } else {
             throw new RuntimeException("numero de parametros incorreto");
         }
-        File yamlFile = null;
-
-        if (yamlConfigFile != null && !yamlConfigFile.isEmpty()) {
-            //try it from simple file name path
-            File _yamlFile = new File(yamlConfigFile);
-            if (_yamlFile.exists()) {
-                yamlFile = _yamlFile.getAbsoluteFile();
-            } else {
-                System.out.println(yamlConfigFile);
-                yamlFile = new File(new URL(yamlConfigFile).toURI());
-            }
-            if (!yamlFile.exists()) {
-                throw new RuntimeException("arquivo de configuração faltando");
-            }
-        } else {
-            //TODO load default config file ?
-            throw new UnsupportedOperationException("não existe suporte para defaul");
+        File yamlFile = new File(yamlConfigFile);
+        if (!yamlFile.exists()) {
+            throw new RuntimeException("arquivo de configuração faltando");
         }
-
-        DatabaseConfig dbconfig;
-        try {
-            dbconfig = new DatabaseConfig(yamlFile);
-            IResolver templateResolver = getResolver(yamlFile);
-            IronBoneRender render = new IronBoneRender(templateResolver);
-            IronBoneApplication app = new IronBoneApplication(dbconfig.getConnection(), render);
-            app.run(tableName);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        InputStream is = new FileInputStream(yamlFile);
+        Yaml yaml = new Yaml();
+        IronBoneConfiguration configuration = yaml.loadAs(is, IronBoneConfiguration.class);
+        IronBoneRunner runner = new IronBoneRunner();
+        runner.run(configuration, tableName);
     }
 
-    /**
-     * busca a classe responsaber por resolver template
-     *
-     * @param yamlFile
-     * @return
-     */
-    private static IResolver getResolver(File yamlFile) throws FileNotFoundException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Yaml yaml = new Yaml();
-        InputStream read = new FileInputStream(yamlFile);
-        Map data = (Map) yaml.load(read);
-        Map resolverProperties = (Map) ((Map) data.get("config")).get("resolver");
-        String className = (String) resolverProperties.get("class");
-        IResolver resolver = null;
-        Object obj = Class.forName(className).newInstance();
-        resolver = (IResolver) obj;
-        resolver.build(resolverProperties);
-
-        return resolver;
+    private IResolver loadResolverDriver(String driver) {
+        IResolver obj = null;
+        try {
+            obj = (IResolver) Class.forName(driver).newInstance();
+        } catch (ClassNotFoundException ex) {
+        } catch (InstantiationException ex) {
+        } catch (IllegalAccessException ex) {
+        }
+        return obj;
     }
 }

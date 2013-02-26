@@ -71,10 +71,10 @@ public class IronBoneRenderTest {
         data.columns.add(data.primaryKey);
         data.columns.add(new Column("NAME", Column.COLUMN_TYPE.STRING));
         data.columns.add(new Column("DESCRIPTION", Column.COLUMN_TYPE.STRING));
-        Map properties = (Map) readYamlFile(
-                new File(this.getClass().getResource("config.yml").toURI())).get("config");
-        properties = (Map) properties.get("resolver");
-        IronBoneRender instance = new IronBoneRender(new JavaResolver().build(properties));
+        IronBoneConfiguration properties = readYamlFile(
+                new File(this.getClass().getResource("config.yml").toURI()));
+        
+        IronBoneRender instance = new IronBoneRender(new JavaResolver().build(properties.config.resolver));
         
         
         int result = instance.render(data);
@@ -111,10 +111,10 @@ public class IronBoneRenderTest {
         assertEquals(expResult, result);
     }
 
-    private Map readYamlFile(File yamlfile) throws FileNotFoundException {
+    private IronBoneConfiguration readYamlFile(File yamlfile) throws FileNotFoundException {
         Yaml yaml = new Yaml();
         InputStream read = new FileInputStream(yamlfile);
-        Map data = (Map) yaml.load(read);
+        IronBoneConfiguration data =  yaml.loadAs(read, IronBoneConfiguration.class);
         return data;
     }
 }

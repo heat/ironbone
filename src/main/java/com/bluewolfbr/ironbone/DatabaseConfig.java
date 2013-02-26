@@ -15,28 +15,19 @@
  */
 package com.bluewolfbr.ironbone;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.yaml.snakeyaml.Yaml;
 
 /**
  * Read database information and give the connection
+ *
  * @author OnezinoGabriel
  */
 public class DatabaseConfig {
-    
+
     private String url;
     private String driver;
     private String database;
@@ -44,77 +35,45 @@ public class DatabaseConfig {
     private String password;
     private String catalog;
     private String schema;
-    
-    
     private Connection conn;
-    
-    public DatabaseConfig(String yamlfile) throws MalformedURLException, URISyntaxException, FileNotFoundException {
-        this(new URI(yamlfile));
+
+    public DatabaseConfig(IronBoneConfiguration.Database database) {
+        this.driver = database.driver;
+        this.database = database.database;
+        this.user = database.user;
+        this.password = database.password;
+        this.schema = database.schema;
+        this.catalog = database.catalog;
+        this.url = database.url;
     }
-    
-    public DatabaseConfig(URL yamlfile) throws FileNotFoundException, URISyntaxException {
-        this(yamlfile.toURI());
+
+    public DatabaseConfig(IronBoneConfiguration appconfig) {
+        this(appconfig.database);
     }
-    
-    public DatabaseConfig(URI yamlfile) throws FileNotFoundException {
-        this(new File(yamlfile));
-    }
-    
-    public DatabaseConfig(File yamlfile) throws FileNotFoundException {
-        readYamlFile(yamlfile);
-    }
-    
-    private void readYamlFile(File yamlfile) throws FileNotFoundException {
-        Yaml yaml = new Yaml();
-        InputStream read = new FileInputStream(yamlfile);
-        Map data = (Map) yaml.load(read);
-        System.out.println(data);
-        try {
-            mappingYaml((Map) data.get("database"));
-        }catch(MalformedURLException e) {
-            
-        }
-    }
-    
-    private void mappingYaml(Map data) throws MalformedURLException {
-        this.driver = (String) data.get("driver");
-        this.database =(String) data.get("database");
-        this.user =(String) data.get("user");
-        this.password =(String) data.get("password");
-        this.catalog =(String) data.get("catalog");
-        this.schema =(String) data.get("schema");
-        this.url = (String) data.get("url");        
-    }    
+
     /**
      * return a connection based in configfile
-     * @return 
+     *
+     * @return
      */
     public Connection getConnection() {
-        if(conn == null) {
+        if (conn == null) {
             try {
                 conn = createConnection();
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(DatabaseConfig.class.getName()).log(Level.SEVERE, null, ex);
-            }catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(DatabaseConfig.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return conn;
     }
-    
-    
+
     private Connection createConnection() throws ClassNotFoundException, SQLException {
         Class.forName(this.driver);
         //TODO necessario fazer validacao e concatenacao para database
         return DriverManager.getConnection(this.url, this.user, this.password);
 
     }
-    
-    String getUrl() {
-        return this.url;
-    }
-
-
-
 
 }

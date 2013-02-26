@@ -16,17 +16,18 @@
 package com.bluewolfbr.ironbone.template.java;
 
 import com.bluewolfbr.ironbone.IResolver;
-import com.bluewolfbr.ironbone.utils.PropertiesParser;
+import com.bluewolfbr.ironbone.IronBoneConfiguration;
+import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import no.tornado.template.TemplateException;
 
 public class JavaResolver implements IResolver {
 
@@ -47,36 +48,13 @@ public class JavaResolver implements IResolver {
         populateTemplateList(new String[]{"dao.template", "entity.template"});
     }
 
-    public static JavaResolver getJavaResolver(Map properties) {
-        JavaResolver instance = new JavaResolver();
-        instance.build(properties);
-        return instance;
-    }
-
     @Override
-    public JavaResolver build(Map properties) {
-        if (properties.containsKey("package") && properties.get("package") != null) {
-            this.context.put("package", properties.get("package"));
-        }
-        if (properties.containsKey("outputdir") && properties.get("outputdir") != null) {
-            this.outputBaseDir = (String) properties.get("outputdir");
-        }
-        if (properties.containsKey("templatedir") && properties.get("templatedir") != null) {
-            try {
-                this.templateDir = PropertiesParser.parser((String) properties.get("templatedir"), context);
-
-            } catch (TemplateException ex) {
-            }
-        }
-        if (properties.containsKey("templates") && properties.get("templates") != null) {
-            List templateList = (List) properties.get("templates");
-            String[] templates = new String[templateList.size()];
-            for (int i = 0; i < templateList.size(); i++) {
-                templates[i] = (String) templateList.get(i);
-            }
-            populateTemplateList(templates);
-        }
+    public JavaResolver build(IronBoneConfiguration.ResolverConfig resolverConfig) {
+        this.context.put("sourcepackage", resolverConfig.sourcepackage);
+        this.context.put("outputdir", resolverConfig.outputdir);
+        this.context.put("templatedir", resolverConfig.templatedir);
         
+        populateTemplateList(resolverConfig.templates);
         return this;
     }
 
@@ -96,7 +74,7 @@ public class JavaResolver implements IResolver {
         List<File> f = new ArrayList<File>();
         try {
             URL url = JavaResolver.class.getResource("entity.template");
-            
+
             File file = new File(url.toURI());
             f.add(file);
             url = JavaResolver.class.getResource("dao.template");
@@ -128,4 +106,24 @@ public class JavaResolver implements IResolver {
         return this.context;
     }
 
+    @Override
+    public void accept(IVisitor visitor) {
+        final List<String> properties = new ArrayList<String>();
+        try {
+            properties.add(
+                    "resolverdir:"
+                    + this.getClass().getResource("JavaResolver.class").toURI().getPath());
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(JavaResolver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        IVisitor.IContextData contextData = new IVisitor.IContextData() {
+            @Override
+            public Iterator<String> iterator() {
+                return properties.iterator();
+            }
+        };
+        
+        visitor.visit(contextData);
+    }
 }

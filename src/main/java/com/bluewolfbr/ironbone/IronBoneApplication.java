@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.utils.IVisitable;
+import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -24,12 +26,20 @@ import java.util.Collection;
 import java.util.List;
 
 import com.bluewolfbr.ironbone.utils.TransformSQLType;
+import java.io.File;
+import java.util.Iterator;
 
-public class IronBoneApplication {
+public class IronBoneApplication implements IVisitable {
 
     private Connection conn;
     private IronBoneRender renderEngine;
 
+    private IronBoneApplication(){
+        
+    }
+    public IronBoneApplication(DatabaseConfig dbconfig, IronBoneRender renderEngine) {
+        this(dbconfig.getConnection(), renderEngine);
+    }
     public IronBoneApplication(Connection conn, IronBoneRender renderEngine) {
         this.conn = conn;
         this.renderEngine = renderEngine;
@@ -49,23 +59,24 @@ public class IronBoneApplication {
 
     public Column getColumnPrimaryKey(String tablename) throws SQLException {
         Column column = null;
-        DatabaseMetaData
-                 metadata = conn.getMetaData();
+        DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);
-        
-        if(rs.next()){
-        String columnName = rs.getString("COLUMN_NAME");
-        
-        if (!rs.isLast())
-            throw new SQLException("Not composite key supported");
-        
-        rs = metadata.getColumns(null, null, tablename, columnName);
-        rs.next();
-        column = resultsetToColumn(rs);
-        return column;
+
+        if (rs.next()) {
+            String columnName = rs.getString("COLUMN_NAME");
+
+            if (!rs.isLast()) {
+                throw new SQLException("Not composite key supported");
+            }
+
+            rs = metadata.getColumns(null, null, tablename, columnName);
+            rs.next();
+            column = resultsetToColumn(rs);
+            return column;
         }
         throw new SQLException("Primary key not found.");
     }
+
     /**
      * Retrieve the columns into collection of Columns <br>
      *
@@ -126,5 +137,26 @@ public class IronBoneApplication {
         }
 
         return columns.toArray(new String[]{});
+    }
+
+    
+    public static IronBoneApplication getEmptyInstance() {
+        return new IronBoneApplication();
+    }
+    
+    @Override
+    public void accept(IVisitor visitor) {
+        final List<String> properties = new ArrayList<String>();
+        properties.add(
+                "resolverdir:"
+                + new File("null").toURI().getPath());
+
+        IVisitor.IContextData contextData = new IVisitor.IContextData() {
+            @Override
+            public Iterator<String> iterator() {
+                return properties.iterator();
+            }
+        };
+        visitor.visit(contextData);
     }
 }

@@ -15,6 +15,12 @@
  */
 package com.bluewolfbr.ironbone;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -26,11 +32,17 @@ import org.yaml.snakeyaml.Yaml;
 
 public class DatabaseConfigTest {
     
+    private static IronBoneConfiguration configuration = new IronBoneConfiguration();
     public DatabaseConfigTest() {
     }
     
     @BeforeClass
-    public static void setUpClass() {
+    public static void setUpClass() throws URISyntaxException, FileNotFoundException {
+        URI file = DatabaseConfigTest.class.getResource("config.yml").toURI();
+        InputStream is = new FileInputStream(new File(file));
+        Yaml yaml = new Yaml();
+        
+        DatabaseConfigTest.configuration = yaml.loadAs(is, IronBoneConfiguration.class);
     }
     
     @AfterClass
@@ -98,15 +110,11 @@ public class DatabaseConfigTest {
         }));
         
     }
-    @Test
-    public void testInitialize() throws Exception {
-        DatabaseConfig config = new DatabaseConfig(this.getClass().getResource("config.yml"));
-        assertEquals("jdbc:hsqldb:mem:data/test", config.getUrl());
-    }
+    
     @Test
     public void testGetConnection() throws Exception {
         System.out.println("getConnection");
-        DatabaseConfig instance = new DatabaseConfig(this.getClass().getResource("config.yml"));
+        DatabaseConfig instance = new DatabaseConfig(DatabaseConfigTest.configuration);
         Connection result = instance.getConnection();
         assertNotNull(result);
     }
