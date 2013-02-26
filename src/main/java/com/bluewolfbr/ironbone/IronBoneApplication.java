@@ -42,10 +42,28 @@ public class IronBoneApplication {
 
     public Table getTableRef(String tablename) throws SQLException {
         Table ref = new Table(tablename);
+        ref.primaryKey = getColumnPrimaryKey(tablename);
         ref.columns.addAll(this.getColumnsRef(tablename));
         return ref;
     }
 
+    public Column getColumnPrimaryKey(String tablename) throws SQLException {
+        Column column = null;
+        DatabaseMetaData
+                 metadata = conn.getMetaData();
+        ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);
+        
+        rs.next();
+        String columnName = rs.getString("COLUMN_NAME");
+        
+        if (!rs.isLast())
+            throw new SQLException("Not composite key supported");
+        
+        rs = metadata.getColumns(null, null, tablename, columnName);
+        rs.next();
+        column = resultsetToColumn(rs);
+        return column;
+    }
     /**
      * Retrieve the columns into collection of Columns <br>
      *

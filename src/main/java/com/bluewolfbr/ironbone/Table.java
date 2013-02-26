@@ -12,7 +12,6 @@ public class Table {
     
     public Table(String name) {
         this.name = name;
-        this.primaryKey = new Column("", Column.COLUMN_TYPE.STRING);
         columns = new ArrayList<Column>();
     }
 

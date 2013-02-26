@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.bluewolfbr.ironbone.Column.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.template.java.Resolver;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import org.junit.Test;
@@ -147,9 +148,21 @@ public class IronBoneApplicationTest {
     }
 
     @Test
+    public void testePrimaryKey() throws SQLException {
+        IronBoneRender render = Mockito.mock(IronBoneRender.class);
+        IronBoneApplication app = new IronBoneApplication(conn, render);
+
+        Table product = app.getTableRef("PRODUTO");
+
+        Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
+        assertEquals(primaryKey, product.primaryKey);
+
+    }
+
     /**
      * test if lower or uppercase are the same in table comparison
      */
+    @Test
     public void testTableNameComparison() {
         Table product = new Table("ProducT");
         product.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
