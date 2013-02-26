@@ -36,6 +36,7 @@ public class PropertiesParser {
     }
 
     public static void  addContextProperties(String key, String value) {
+        System.out.println(String.format("included propertie %s : %s", key, value));
         PropertiesParser.applicationContext.put(key,value);
     }
 }

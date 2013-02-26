@@ -110,36 +110,6 @@ public class IronBoneApplication implements IVisitable {
         return column;
     }
 
-    /**
-     * read the columns name of the table. <br>
-     *
-     * @see DatabaseMetaData#getColumns(String, String, String, String)
-     * @param table
-     * @return
-     * @throws SQLException
-     */
-    @Deprecated
-    public String[] getColumnsTable(String table) throws SQLException {
-        List<String> columns = new ArrayList<String>();
-
-        DatabaseMetaData metadata = conn.getMetaData();
-
-        ResultSet rs = metadata.getColumns(null, null, table, null);
-
-        while (rs.next()) {
-            System.out.println(rs.getString("TABLE_CAT"));
-            System.out.println(rs.getString("TABLE_SCHEM"));
-            System.out.println(rs.getString("COLUMN_NAME"));
-            System.out.println(rs.getString("TYPE_NAME"));
-            System.out.println(rs.getInt("DATA_TYPE"));
-
-            columns.add(rs.getString("COLUMN_NAME"));
-        }
-
-        return columns.toArray(new String[]{});
-    }
-
-    
     public static IronBoneApplication getEmptyInstance() {
         return new IronBoneApplication();
     }
@@ -148,8 +118,8 @@ public class IronBoneApplication implements IVisitable {
     public void accept(IVisitor visitor) {
         final List<String> properties = new ArrayList<String>();
         properties.add(
-                "resolverdir:"
-                + new File("null").toURI().getPath());
+                "basedir:"
+                + new File("null").getAbsoluteFile().getParentFile().getParent());
 
         IVisitor.IContextData contextData = new IVisitor.IContextData() {
             @Override

@@ -20,7 +20,9 @@ import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
 
 public class IronBoneRunner {
 
@@ -76,6 +78,7 @@ public class IronBoneRunner {
         }
         is = new FileInputStream(yamlFile);
         configuration = yaml.loadAs(is, IronBoneConfiguration.class);
+        System.out.println("Current configuration:\n" + yaml.dumpAs(configuration, Tag.YAML, FlowStyle.BLOCK));
         runner.run(configuration, tableName);
     }
 

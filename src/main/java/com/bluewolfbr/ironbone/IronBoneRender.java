@@ -64,6 +64,10 @@ public class IronBoneRender {
         } catch (Exception e) {
             throw e;
         }
+        System.out.println("The follow files are created.");
+        for(File file : outputFileList){
+            System.out.println(file.getAbsolutePath());
+        }
         return 0;
     }
 
@@ -85,7 +89,7 @@ public class IronBoneRender {
         Template simpleTemplate = new Template(template, ctx);
         
         File outputFile = new File(outputdir, filename);
-        System.out.println("write in" + outputFile.toString());
+        System.out.println("wrote in" + outputFile.toString());
         Writer writer = new FileWriter(outputFile);
         writer.write(simpleTemplate.render());
         writer.flush();

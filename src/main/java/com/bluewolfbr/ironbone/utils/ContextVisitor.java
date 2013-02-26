@@ -29,7 +29,9 @@ public class ContextVisitor implements IVisitor{
         while(iterator.hasNext())
         {
             String data = iterator.next();
-            String[] map = data.split(":");
+            System.out.println("attempting add propertie " + data);
+            String[] map = data.split(":", 2);
+            System.out.println("splited in " + map);
             PropertiesParser.addContextProperties(map[0], map[1]);
         }
     }
