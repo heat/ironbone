@@ -26,4 +26,6 @@ public interface IResolver<T extends IResolver> extends IVisitable {
     public File getOutputDirectory();
     public String getFileName(File template, String name);
     public Map getContext();
+    
+    public int generate();
 }

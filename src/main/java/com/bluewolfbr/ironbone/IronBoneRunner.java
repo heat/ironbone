@@ -19,10 +19,7 @@ import com.bluewolfbr.ironbone.utils.ContextVisitor;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
 public class IronBoneRunner {
@@ -53,25 +50,39 @@ public class IronBoneRunner {
     }
 
     public static void main(String[] args) throws Exception {
+        IronBoneRunner runner = new IronBoneRunner();
         String yamlConfigFile = "";
         String tableName = "";
+        File yamlFile;
+        InputStream is;
+        IronBoneConfiguration configuration;
+        Yaml yaml = new Yaml();
+        
         if (args.length == 2) {
             yamlConfigFile = args[0];
             tableName = args[1];
+            
+            if(args[0].equals("--generate")){
+                
+                runner.generateDefaultFiles(args[0], args[1]);
+                return;
+            }
         } else {
             throw new RuntimeException("numero de parametros incorreto");
         }
-        File yamlFile = new File(yamlConfigFile);
+        yamlFile = new File(yamlConfigFile);
         if (!yamlFile.exists()) {
             throw new RuntimeException("arquivo de configuração faltando");
         }
-        InputStream is = new FileInputStream(yamlFile);
-        Yaml yaml = new Yaml();
-        IronBoneConfiguration configuration = yaml.loadAs(is, IronBoneConfiguration.class);
-        IronBoneRunner runner = new IronBoneRunner();
+        is = new FileInputStream(yamlFile);
+        configuration = yaml.loadAs(is, IronBoneConfiguration.class);
         runner.run(configuration, tableName);
     }
 
+    private void generateDefaultFiles(String cmd, String driver){
+        IResolver resolverDriver = loadResolverDriver(driver);
+        resolverDriver.generate();
+    }
     private IResolver loadResolverDriver(String driver) {
         IResolver obj = null;
         try {

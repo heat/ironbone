@@ -19,8 +19,13 @@ import com.bluewolfbr.ironbone.IResolver;
 import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +50,6 @@ public class JavaResolver implements IResolver {
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
-        populateTemplateList(new String[]{"dao.template", "entity.template"});
     }
 
     @Override
@@ -53,7 +57,7 @@ public class JavaResolver implements IResolver {
         this.context.put("sourcepackage", resolverConfig.sourcepackage);
         this.context.put("outputdir", resolverConfig.outputdir);
         this.context.put("templatedir", resolverConfig.templatedir);
-        
+
         populateTemplateList(resolverConfig.templates);
         return this;
     }
@@ -71,18 +75,7 @@ public class JavaResolver implements IResolver {
 
     @Override
     public File[] getTemplates() {
-        List<File> f = new ArrayList<File>();
-        try {
-            URL url = JavaResolver.class.getResource("entity.template");
-
-            File file = new File(url.toURI());
-            f.add(file);
-            url = JavaResolver.class.getResource("dao.template");
-            file = new File(url.toURI());
-            f.add(file);
-        } catch (URISyntaxException e) {
-        }
-        return f.toArray(new File[]{});
+        return this.templateFileList.toArray(new File[]{});
     }
 
     @Override
@@ -123,7 +116,49 @@ public class JavaResolver implements IResolver {
                 return properties.iterator();
             }
         };
-        
+
         visitor.visit(contextData);
+    }
+
+    /**
+     * @see IResolver#generate()
+     * @return
+     */
+    @Override
+    public int generate() {
+        File baseDir;
+
+        baseDir = new File("Null").getAbsoluteFile().getParentFile();
+        String[] files = new String[]{
+            "config.yml",
+            "templates/README"
+        };
+        try {
+            for (String file : files) {
+                this.copyFile(file, baseDir);
+            }
+        } catch (IOException ex) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private void copyFile(String in, final File outBase) throws IOException {
+        InputStream is = null;
+        try {
+            is = this.getClass().getResourceAsStream(in);
+            File outFile = new File(outBase, in);
+            outFile.getAbsoluteFile().getParentFile().mkdirs();
+            if (!outFile.exists()) {
+                outFile.createNewFile();
+            }
+
+            Path path = outFile.getAbsoluteFile().toPath();
+            Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
     }
 }

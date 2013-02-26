@@ -1,0 +1,18 @@
+!!yaml
+config:
+  resolver:
+    driver: null
+    outputdir: null
+    sourcepackage: null
+    suffix: null
+    templatedir: null
+    templates:
+    - README
+database:
+  catalog: null
+  database: null
+  driver: null
+  password: null
+  schema: null
+  url: null
+  user: null
