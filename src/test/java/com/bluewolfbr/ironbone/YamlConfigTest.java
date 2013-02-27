@@ -20,7 +20,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import no.tornado.template.Template;
 import no.tornado.template.TemplateException;
@@ -81,7 +85,8 @@ public class YamlConfigTest {
         Writer outputFile = new FileWriter(tmpFile);
 
         IronBoneConfiguration config = new IronBoneConfiguration();
-        config.config.resolver.templates = new String[]{"entity.template", "dao.template", "something.template"};
+        config.config.resolver.templates = new String[][]{
+            new String[]{"entity.template", "aa"},new String[]{"entity.template", "aa"},new String[]{"entity.template", "aa"}};
         Yaml yaml = new Yaml();
 
         String outputContent = yaml.dumpAs(config, Tag.YAML, DumperOptions.FlowStyle.BLOCK);
@@ -95,7 +100,35 @@ public class YamlConfigTest {
         assertNotNull(parsed);
         assertTrue(true);
     }
-
+    @Test
+    public void testParserIterator() throws TemplateException {
+        Template template;
+        String content = "[#list names as name]my name is: ${name} [/#list]";
+        List<String> namesList = new ArrayList<String>();
+        namesList.add("Onezino");
+        namesList.add("Luisa");
+        Map ctx = new HashMap();
+        ctx.put("names", namesList);
+        template = new Template(content, ctx);
+        String expected = "my name is: Onezino my name is: Luisa ";
+        String result = template.render();
+        assertEquals(expected, result);
+    }
+    @Test
+    public void testParserEnhancedIterator() throws TemplateException {
+        Template template;
+        String content = "[#list names as name]my name is: ${name}[/#list separetor=',']";
+        List<String> namesList = new ArrayList<String>();
+        namesList.add("Onezino");
+        namesList.add("Luisa");
+        Map ctx = new HashMap();
+        ctx.put("names", namesList);
+        template = new Template(content, ctx);
+        String expected = "my name is: Onezino,my name is: Luisa";
+        String result = template.render();
+        assertEquals(expected, result);
+    }
+    
     @Test
     public void testParserDirectoryPropertie() throws TemplateException {
         Template template;

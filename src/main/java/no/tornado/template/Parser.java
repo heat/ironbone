@@ -14,7 +14,7 @@ public class Parser implements Serializable {
     enum STRING_TRANSFORMATIONS { CAMELCASE, METHOD_NAME, UPPERCASE, LOWERCASE};
     public static final String PATH_SEPARATOR = "\\.(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)}");
-    public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list]", Pattern.DOTALL);
+    public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list( separetor='(.*?)')?]", Pattern.DOTALL);
     public static final Pattern ARRAY_PATTERN = Pattern.compile(".*\\[(\\d*)\\]$");
     public static final Pattern TRANSFORM_PATTERN = Pattern.compile(".*\\?(.*)$");
     public static final Pattern TRANSFORM_ARG_PATTERN = Pattern.compile(".*\\((.*)\\)$");
@@ -31,12 +31,16 @@ public class Parser implements Serializable {
         Matcher matcher = ITERATE_PATTERN.matcher(template.getSource());
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
+            System.out.println(
+            matcher.groupCount());
+            
             String listProperty = matcher.group(1);
             String listVariable = matcher.group(2);
             String content = matcher.group(3);
-
+            String separator = matcher.group(5);
+            System.out.println("separator " + separator);
             // Extract content in iterable and parse
-            matcher.appendReplacement(sb, expandIterator(listProperty, listVariable, content));
+            matcher.appendReplacement(sb, expandIterator(listProperty, listVariable, content, separator));
         }
         matcher.appendTail(sb);
 
@@ -52,7 +56,7 @@ public class Parser implements Serializable {
      * @return An expanded string with parsed content
      * @throws TemplateException If object without default value is encountered
      */
-    private String expandIterator(String listProperty, String listVariable, String content) throws TemplateException {
+    private String expandIterator(String listProperty, String listVariable, String content, String separator) throws TemplateException {
         StringBuilder sb = new StringBuilder();
         List list;
 
@@ -70,11 +74,15 @@ public class Parser implements Serializable {
             list.addAll((Collection) listObject);
         }else
             throw new TemplateException("Trying to iterate over property " + listProperty + " which is not a list or array", template);
-
-        for (Object object : list) {
+        int length = list.size() ;
+        for (int i = 0; i < length; i++) {
+            Object object = list.get(i);
             Object existingVariable = template.getContext().get(object);
             template.getContext().put(listVariable, object);
             sb.append(renderPart(content).replaceAll("^\n", ""));
+            if(i < length - 1 && separator != null) {
+                sb.append(separator);
+            }
             template.getContext().put(listVariable, existingVariable);
         }
         return sb.toString();
