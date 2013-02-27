@@ -35,7 +35,7 @@ public class IronBoneConfiguration {
         public String sourcepackage;
         public String suffix;
         public String templatedir;
-        public String[] templates = new String[]{};
+        public String[][] templates = new String[][]{};
     }
     public static class Configuration {
         public ResolverConfig resolver = new ResolverConfig();

@@ -18,6 +18,7 @@ package com.bluewolfbr.ironbone.template.java;
 import com.bluewolfbr.ironbone.IResolver;
 import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitor;
+import com.bluewolfbr.ironbone.utils.PropertiesParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,23 +36,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import no.tornado.template.TemplateException;
 
 public class JavaResolver implements IResolver {
 
     private Map context;
     private String outputBaseDir = new File("").getAbsolutePath();
+    private String suffix = "";
     private String templateDir = "";
     private String packageBase = "";
-    private List<File> templateFileList = new ArrayList<File>();
+    private String[][] templateFileList = new String[][]{};
 
     public JavaResolver() {
         this.context = new HashMap();
-        context.put("package", "");
-        try {
-            URL defaultClassFolder = this.getClass().getResource("JavaResolver.class");
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
@@ -59,6 +56,8 @@ public class JavaResolver implements IResolver {
         this.context.put("sourcepackage", resolverConfig.sourcepackage);
         this.context.put("outputdir", resolverConfig.outputdir);
         this.context.put("templatedir", resolverConfig.templatedir);
+        this.context.put("suffix", resolverConfig.suffix);
+        this.suffix = resolverConfig.suffix;
         this.templateDir = resolverConfig.templatedir;
         this.outputBaseDir = resolverConfig.outputdir;
         this.packageBase = resolverConfig.sourcepackage;
@@ -66,25 +65,33 @@ public class JavaResolver implements IResolver {
         return this;
     }
 
-    private void populateTemplateList(String[] templates) {
-        templateFileList.clear();
+    private void populateTemplateList(String[][] templates) {
+        this.templateFileList = Arrays.copyOf(templates, templates.length);
+        
         File templateDir = new File(this.templateDir);
-        System.out.println("template directory lookup " + templateDir.getPath());
-        for (String template : templates) {
-
-            File f = new File(templateDir, template);
-            System.out.println("seeking for template " + f);
-            System.out.println("did you find - " + f.exists());
-            if (f.exists()) {
-                templateFileList.add(f);
-            }
+        
+        for(int i = 0; i < this.templateFileList.length; i++) {
+            String templateName = templateFileList[i][0];
+             File f = new File(templateDir, templateName);
+             
+             if(f.exists()) {
+                 templateFileList[i][0] = f.getAbsolutePath();
+             } else {
+                 templateFileList[i][0] = null;
+                 templateFileList[i][1] = null;
+             }
         }
-        System.out.println("loaded templates : " + Arrays.toString(this.templateFileList.toArray()));
     }
 
     @Override
     public File[] getTemplates() {
-        return this.templateFileList.toArray(new File[]{});
+        List<File> templateFileList = new ArrayList<File>();
+        for(String[] templateData : this.templateFileList) {
+            if(templateData[0] != null) {
+                templateFileList.add(new File(templateData[0]));
+            }
+        }
+        return templateFileList.toArray(new File[]{});
     }
 
     @Override
@@ -110,11 +117,27 @@ public class JavaResolver implements IResolver {
         outputPath = new File(outputPath,
                 this.packageBase.replace(".", File.separator));
         outputPath = new File(outputPath, relativeTemplateDir);
-        
-        String filename = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + ".java";
+        String filename = null;
+        try{
+            for(int i = 0; i < this.templateFileList.length; i++){
+                String[] templateData = this.templateFileList[i];
+                if(templateData == null) {
+                    continue;
+                }
+                File originalTemplate = new File(templateData[0]);
+                if(Files.isSameFile(template.toPath(), originalTemplate.toPath())){
+                    filename = templateData[1] + this.context.get("suffix");
+                }
+            }
 
+            PropertiesParser.addContextProperties("name", name);
+            filename = PropertiesParser.parser(filename);
+        }catch(TemplateException ex) {
+            
+        }catch(IOException ex){
+            
+        }
         outputPath.mkdirs();       
-
         return new File(outputPath, filename);
     }
 

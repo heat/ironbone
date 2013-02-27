@@ -7,9 +7,12 @@ config:
     suffix: .java
     templatedir: ${basedir}/templates
     templates:
-    - entity.template
-    - dao.template
-    - something.template
+    - [ entity.template, 
+       "${name?format(\"CAMELCASE\")Transfer" ]
+    - [ dao.template,
+        "${name?format(\"CAMELCASE\")Dao" ]
+    - [something.template ,
+        "${dafault}"]
 database:
   catalog: null
   database: null
