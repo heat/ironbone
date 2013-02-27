@@ -29,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class JavaResolver implements IResolver {
     private Map context;
     private String outputBaseDir = new File("").getAbsolutePath();
     private String templateDir = "";
+    private String packageBase = "";
     private List<File> templateFileList = new ArrayList<File>();
 
     public JavaResolver() {
@@ -59,7 +61,7 @@ public class JavaResolver implements IResolver {
         this.context.put("templatedir", resolverConfig.templatedir);
         this.templateDir = resolverConfig.templatedir;
         this.outputBaseDir = resolverConfig.outputdir;
-
+        this.packageBase = resolverConfig.sourcepackage;
         populateTemplateList(resolverConfig.templates);
         return this;
     }
@@ -69,7 +71,7 @@ public class JavaResolver implements IResolver {
         File templateDir = new File(this.templateDir);
         System.out.println("template directory lookup " + templateDir.getPath());
         for (String template : templates) {
-            
+
             File f = new File(templateDir, template);
             System.out.println("seeking for template " + f);
             System.out.println("did you find - " + f.exists());
@@ -95,10 +97,25 @@ public class JavaResolver implements IResolver {
     }
 
     @Override
-    public String getFileName(File template, String name) {
-        String templateName = template.getName();
-        String fileName = templateName + name + ".java";
-        return fileName;
+    public File getFileName(File template, String name) {
+
+        String relativeTemplateDir = template.getParentFile().getAbsolutePath().replace(
+                new File(this.templateDir).getAbsolutePath(), "");
+        //remove o separador do final
+        if (relativeTemplateDir.startsWith(File.separator)) {
+            relativeTemplateDir = relativeTemplateDir.substring(1);
+        }
+
+        File outputPath = new File(this.outputBaseDir);
+        outputPath = new File(outputPath,
+                this.packageBase.replace(".", File.separator));
+        outputPath = new File(outputPath, relativeTemplateDir);
+        
+        String filename = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + ".java";
+
+        outputPath.mkdirs();       
+
+        return new File(outputPath, filename);
     }
 
     @Override
@@ -167,5 +184,17 @@ public class JavaResolver implements IResolver {
                 is.close();
             }
         }
+    }
+
+    @Override
+    public Map getContext(File template) {
+        File templateDir = new File(this.templateDir).getAbsoluteFile();
+        File templateParent = template.getAbsoluteFile().getParentFile();
+        
+        String realPakcage = templateParent.getAbsolutePath().replace(templateDir.getAbsolutePath(), "").replace(File.separator, ".");
+        Map ctx = new HashMap(this.context);
+        ctx.put("sourcepackage", this.packageBase + realPakcage);
+        
+        return ctx;
     }
 }

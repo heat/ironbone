@@ -49,7 +49,7 @@ public class IronBoneConfiguration {
         this.config.resolver.outputdir =
                 PropertiesParser.parser(this.config.resolver.outputdir);
         this.config.resolver.sourcepackage = 
-                PropertiesParser.parser(this.config.resolver.outputdir);
+                PropertiesParser.parser(this.config.resolver.sourcepackage);
         this.config.resolver.templatedir = 
                 PropertiesParser.parser(this.config.resolver.templatedir);
     }

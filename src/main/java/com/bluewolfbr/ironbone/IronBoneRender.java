@@ -81,14 +81,13 @@ public class IronBoneRender {
      */
     private File render(File template, Table data) throws IOException, TemplateException {
         Map ctx = new HashMap();
+        File outputFile = null;
         ctx.put("table", data);
         //merge additional context information
-        ctx.putAll(this.templateResolver.getContext());
-        File outputdir = this.templateResolver.getOutputDirectory();
-        String filename = this.templateResolver.getFileName(template, data.name);
+        ctx.putAll(this.templateResolver.getContext(template));
         Template simpleTemplate = new Template(template, ctx);
         
-        File outputFile = new File(outputdir, filename);
+        outputFile = this.templateResolver.getFileName(template, data.name);
         System.out.println("wrote in" + outputFile.toString());
         Writer writer = new FileWriter(outputFile);
         writer.write(simpleTemplate.render());

@@ -21,11 +21,44 @@ import java.util.Map;
 
 
 public interface IResolver<T extends IResolver> extends IVisitable {
+    /**
+     * build Resolver with new parameters
+     * @param resolverConfig
+     * @return 
+     */
     public T build(IronBoneConfiguration.ResolverConfig resolverConfig);
+    /**
+     * get template files
+     * @return 
+     */
     public File[] getTemplates();
+    /**
+     * get outputDirectory
+     * @return 
+     */
     public File getOutputDirectory();
-    public String getFileName(File template, String name);
+    /**
+     * return the file render
+     * @param template
+     * @param name
+     * @return 
+     */
+    public File getFileName(File template, String name);
+    /**
+     * get the default context of Resolver
+     * @return 
+     */
     public Map getContext();
+    /**
+     * add process based in current template
+     * @param template
+     * @return 
+     */
+    public Map getContext(File template);
     
+    /**
+     * generate a default layout of files.
+     * @return 
+     */
     public int generate();
 }

@@ -105,4 +105,26 @@ public class YamlConfigTest {
 
         assertEquals(new File("null").getAbsolutePath(), template.render());
     }
+    
+    @Test
+    public void testGetFullQualifyClass(){
+        String separetor = "/";
+        String basePackage = "com.bluewolf";
+        String packageOutputDirectory = "c:/test/output/com/bluewolf";
+        
+        String templateFile = "c:/template/dao/arroba/dao.template";
+        String templateDir  = "c:/template";
+        
+        String basePackageDirectory = basePackage.replace(".", separetor);
+               
+        File template = new File(templateFile);
+        
+        File parent = template.getParentFile();
+        File dir = new File(templateDir);
+        String expected = "dao.arroba";
+        String result = parent.getAbsolutePath().replace(dir.getAbsolutePath(), "").replace(File.separator, ".");
+        if(result.startsWith("."))
+            result = result.replaceFirst(".", "");
+        assertEquals(expected, result);
+    }
 }
