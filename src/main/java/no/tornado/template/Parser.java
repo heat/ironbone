@@ -14,7 +14,7 @@ public class Parser implements Serializable {
     enum STRING_TRANSFORMATIONS { CAMELCASE, METHOD_NAME, UPPERCASE, LOWERCASE};
     public static final String PATH_SEPARATOR = "\\.(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)}");
-    public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list( separetor='(.*?)')?]", Pattern.DOTALL);
+    public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list( separator='(.*?)')?]", Pattern.DOTALL);
     public static final Pattern ARRAY_PATTERN = Pattern.compile(".*\\[(\\d*)\\]$");
     public static final Pattern TRANSFORM_PATTERN = Pattern.compile(".*\\?(.*)$");
     public static final Pattern TRANSFORM_ARG_PATTERN = Pattern.compile(".*\\((.*)\\)$");
@@ -59,6 +59,7 @@ public class Parser implements Serializable {
     private String expandIterator(String listProperty, String listVariable, String content, String separator) throws TemplateException {
         StringBuilder sb = new StringBuilder();
         List list;
+        separator = separator == null ? "" : separator;
 
         Object listObject = lookupContext(listProperty);
         if (listObject == null)
@@ -75,14 +76,14 @@ public class Parser implements Serializable {
         }else
             throw new TemplateException("Trying to iterate over property " + listProperty + " which is not a list or array", template);
         int length = list.size() ;
+        String sep = "";
         for (int i = 0; i < length; i++) {
             Object object = list.get(i);
             Object existingVariable = template.getContext().get(object);
             template.getContext().put(listVariable, object);
+            sb.append(sep);
             sb.append(renderPart(content).replaceAll("^\n", ""));
-            if(i < length - 1 && separator != null) {
-                sb.append(separator);
-            }
+            sep = separator;
             template.getContext().put(listVariable, existingVariable);
         }
         return sb.toString();

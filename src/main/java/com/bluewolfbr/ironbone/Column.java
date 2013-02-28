@@ -1,28 +1,28 @@
 package com.bluewolfbr.ironbone;
 
 public class Column {
-    public enum COLUMN_TYPE{
+
+    public enum COLUMN_TYPE {
+
         STRING("String"), INTEGER("Integer"), DOUBLE("Double"), BIGDECIMAL("BigDecimal"), BOOLEAN("Boolean"), LONG("Long"), FLOAT("Float");
-        
         String type;
-        COLUMN_TYPE(String type)  {
+
+        COLUMN_TYPE(String type) {
             this.type = type;
         }
-        
+
         public String toString() {
             return this.type;
         }
     }
+    public String name;
+    public COLUMN_TYPE type;
 
-        public String name;
-        public COLUMN_TYPE type;
-        
     public Column(String name, COLUMN_TYPE type) {
         this.name = name;
         this.type = type;
     }
 
-    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -32,37 +32,38 @@ public class Column {
         return result;
     }
 
-
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Column other = (Column) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.toLowerCase().equals(other.name.toLowerCase()))
+            }
+        } else if (!name.toLowerCase().equals(other.name.toLowerCase())) {
             return false;
-        if (type != other.type)
+        }
+        if (type != other.type) {
             return false;
+        }
         return true;
     }
-
 
     @Override
     public String toString() {
         return "" + this.name + "";
     }
 
-
     @Override
     protected Column clone() throws CloneNotSupportedException {
         return new Column(this.name, this.type);
     }
-    
-    
 }

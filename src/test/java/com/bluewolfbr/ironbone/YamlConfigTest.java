@@ -117,7 +117,7 @@ public class YamlConfigTest {
     @Test
     public void testParserEnhancedIterator() throws TemplateException {
         Template template;
-        String content = "[#list names as name]my name is: ${name}[/#list separetor=',']";
+        String content = "[#list names as name]my name is: ${name}[/#list separator=',']";
         List<String> namesList = new ArrayList<String>();
         namesList.add("Onezino");
         namesList.add("Luisa");
