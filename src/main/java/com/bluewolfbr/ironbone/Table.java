@@ -3,18 +3,48 @@ package com.bluewolfbr.ironbone;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class Table {
 
     public String name;
     public Collection<Column> columns;
-    //TODO chave composta
-    public Column primaryKey;
 
     public Table(String name) {
         this.name = name;
         columns = new HashSet<Column>();
 
+    }
+
+    public List<Column> getPrimaryKeys() {
+        List<Column> columns = new ArrayList<Column>();
+        for (Column c : this.columns) {
+            if (c.primaryKey) {
+                columns.add(c);
+            }
+        }
+        return columns;
+    }
+
+    public List<Column> getForeignKeys() {
+        List<Column> columns = new ArrayList<Column>();
+        for (Column c : this.columns) {
+            if (c.foreignTable != null && !c.foreignTable.isEmpty()) {
+                columns.add(c);
+            }
+        }
+        return columns;
+    }
+
+    public Column getColumnByName(String columnName) {
+        Column returnColumn = null;
+        for (Column column : columns) {
+            if (column.name.equals(columnName)) {
+                returnColumn = column;
+                break;
+            }
+        }
+        return returnColumn;
     }
 
     @Override
@@ -31,10 +61,7 @@ public class Table {
         if (!this.name.toLowerCase().equals(otherTable.name.toLowerCase())) {
             return false;
         }
-        if (!this.primaryKey.equals(otherTable.primaryKey)) {
-            return false;
-        }
-        
+
         return true;
     }
 

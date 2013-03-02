@@ -17,12 +17,21 @@ public class Column {
     }
     public String name;
     public COLUMN_TYPE type;
+    public String foreignTable = "";
+    public boolean primaryKey = false;
+    public boolean foreignKey = false;
 
     public Column(String name, COLUMN_TYPE type) {
         this.name = name;
         this.type = type;
     }
 
+    public String getForeignTableOrType() {
+        if(this.foreignKey) {
+            return this.foreignTable;
+        }
+        return this.type.type;
+    }
     @Override
     public int hashCode() {
         final int prime = 31;
