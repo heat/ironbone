@@ -10,8 +10,15 @@ import java.util.regex.Pattern;
 
 public class Parser implements Serializable {
 
-    enum TRANSFORMATIONS { SIZE, FORMAT}
-    enum STRING_TRANSFORMATIONS { CAMELCASE, METHOD_NAME, UPPERCASE, LOWERCASE};
+    enum TRANSFORMATIONS {
+
+        SIZE, FORMAT
+    }
+
+    enum STRING_TRANSFORMATIONS {
+
+        CAMELCASE, METHOD_NAME, UPPERCASE, LOWERCASE, LOWERCAMELCASE
+    };
     public static final String PATH_SEPARATOR = "\\.(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     public static final Pattern ITERATE_PATTERN = Pattern.compile("\\[#list (.*?) as (.*?)](.*?)\\[/#list( separator='(.*?)')?]", Pattern.DOTALL);
@@ -19,7 +26,6 @@ public class Parser implements Serializable {
     public static final Pattern TRANSFORM_PATTERN = Pattern.compile(".*\\?(.*)$");
     public static final Pattern TRANSFORM_ARG_PATTERN = Pattern.compile(".*\\((.*)\\)$");
     public static final Pattern DEFAULT_PATTERN = Pattern.compile(".*!(.*)$");
-
     private Template template;
 
     public Parser(Template template) {
@@ -32,8 +38,8 @@ public class Parser implements Serializable {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             System.out.println(
-            matcher.groupCount());
-            
+                    matcher.groupCount());
+
             String listProperty = matcher.group(1);
             String listVariable = matcher.group(2);
             String content = matcher.group(3);
@@ -50,6 +56,7 @@ public class Parser implements Serializable {
 
     /**
      * Parse content in each iterator loop
+     *
      * @param listProperty The list property to lookup
      * @param listVariable The variable name for each entry in the list
      * @param content The content between the [#list] tags [/#list]
@@ -62,20 +69,22 @@ public class Parser implements Serializable {
         separator = separator == null ? "" : separator;
 
         Object listObject = lookupContext(listProperty);
-        if (listObject == null)
+        if (listObject == null) {
             throw new TemplateException("Trying to iterate over unexisting property " + listProperty, template);
+        }
 
-        if (listObject instanceof List)
+        if (listObject instanceof List) {
             list = (List) listObject;
-        else if (listObject instanceof Object[]) {
+        } else if (listObject instanceof Object[]) {
             list = new ArrayList();
-            list.addAll(Arrays.asList((Object[])listObject));
-        } else if(listObject instanceof Collection){
+            list.addAll(Arrays.asList((Object[]) listObject));
+        } else if (listObject instanceof Collection) {
             list = new ArrayList();
             list.addAll((Collection) listObject);
-        }else
+        } else {
             throw new TemplateException("Trying to iterate over property " + listProperty + " which is not a list or array", template);
-        int length = list.size() ;
+        }
+        int length = list.size();
         String sep = "";
         for (int i = 0; i < length; i++) {
             Object object = list.get(i);
@@ -92,9 +101,10 @@ public class Parser implements Serializable {
     private String renderPart(String partSource) throws TemplateException {
         Matcher matcher = VARIABLE_PATTERN.matcher(partSource);
         StringBuffer sb = new StringBuffer();
-        while (matcher.find())
-            matcher.appendReplacement(sb, 
+        while (matcher.find()) {
+            matcher.appendReplacement(sb,
                     matcher.quoteReplacement(convert(lookupContext(matcher.group(1)))));
+        }
         matcher.appendTail(sb);
         return sb.toString();
     }
@@ -107,8 +117,9 @@ public class Parser implements Serializable {
 
         for (int i = 1; i < path.length; i++) {
             String pathEntry = path[i];
-            if (resolvePath.length() > 0)
+            if (resolvePath.length() > 0) {
                 resolvePath.append(PATH_SEPARATOR);
+            }
 
             resolvePath.append(pathEntry);
             resolved = findPropertyInObject(resolved, pathEntry);
@@ -140,6 +151,7 @@ public class Parser implements Serializable {
         Matcher transformMatcher = TRANSFORM_PATTERN.matcher(property);
         if (transformMatcher.matches()) {
             transformExpression = transformMatcher.group(1);
+            System.out.println("transform expression " + transformExpression);
             property = property.replaceAll("\\?.*$", "");
         }
 
@@ -148,16 +160,18 @@ public class Parser implements Serializable {
         // Lookup in Map
         if (object instanceof Map) {
             value = ((Map) object).get(property);
-            if (value != null)
+            if (value != null) {
                 return postProcessValue(property, arrayIndex, transformExpression, value);
+            }
         }
 
         // Lookup getter
         try {
             Method getter = object.getClass().getDeclaredMethod(convertPropertyToGetter(property));
             value = getter.invoke(object);
-            if (value != null)
+            if (value != null) {
                 return postProcessValue(property, arrayIndex, transformExpression, value);
+            }
         } catch (Exception noGetter) {
         }
 
@@ -165,14 +179,16 @@ public class Parser implements Serializable {
         try {
             Field field = object.getClass().getDeclaredField(property);
             value = field.get(object);
-            if (value != null)
+            if (value != null) {
                 return postProcessValue(property, arrayIndex, transformExpression, value);
+            }
         } catch (Exception noProperty) {
         }
 
         // Not found, use default expression if any
-        if (defaultExpression != null)
+        if (defaultExpression != null) {
             return expandDefaultExpression(defaultExpression);
+        }
 
         // Nothing, throw exception
         String description = template.getContext().equals(object) ? "context" : object.toString();
@@ -182,8 +198,9 @@ public class Parser implements Serializable {
     private Object expandDefaultExpression(String defaultExpression) throws TemplateException {
         // If surrounded by double quotes or single ticks, output string literal
         if (defaultExpression.startsWith("\"") && defaultExpression.endsWith("\"")
-          || defaultExpression.startsWith("'") && defaultExpression.endsWith("'"))
+                || defaultExpression.startsWith("'") && defaultExpression.endsWith("'")) {
             return stripQuotes(defaultExpression);
+        }
 
         // Assume expression, lookup in context
         return lookupContext(defaultExpression);
@@ -194,22 +211,26 @@ public class Parser implements Serializable {
     }
 
     private Object postProcessValue(String property, Integer arrayIndex, String transformExpression, Object object) throws TemplateException {
-        if (arrayIndex == null)
+        if (arrayIndex == null) {
             return transform(transformExpression, object);
+        }
 
-        if (object instanceof List)
+        if (object instanceof List) {
             return transform(transformExpression, ((List) object).get(arrayIndex));
+        }
 
-        if (object instanceof Object[])
+        if (object instanceof Object[]) {
             return transform(transformExpression, ((Object[]) object)[arrayIndex]);
+        }
 
         throw new TemplateException("Property " + property + " has array reference but is not List or Array", template);
     }
 
     private Object transform(String transformExpression, Object object) throws TemplateException {
         // Return object if no transform rules are applied
-        if (transformExpression == null)
+        if (transformExpression == null) {
             return object;
+        }
 
         // Look for modifiers to transform
         Matcher argMatcher = TRANSFORM_ARG_PATTERN.matcher(transformExpression);
@@ -221,49 +242,70 @@ public class Parser implements Serializable {
 
         switch (TRANSFORMATIONS.valueOf(transformExpression.toUpperCase())) {
             case SIZE:
-                if (object instanceof Object[])
+                if (object instanceof Object[]) {
                     return ((Object[]) object).length;
-                if (object instanceof List)
+                }
+                if (object instanceof List) {
                     return ((List) object).size();
-                if (object instanceof Map)
+                }
+                if (object instanceof Map) {
                     return ((Map) object).size();
-                if (object instanceof String)
+                }
+                if (object instanceof String) {
                     return ((String) object).length();
+                }
 
                 throw new TemplateException("Don't know how to return size for object of class " + object.getClass(), template);
 
             case FORMAT:
-                if (args == null)
+                if (args == null) {
                     throw new TemplateException("No arguments given to format transformation:" + transformExpression, template);
-                if (object instanceof Date || object instanceof java.sql.Date || object instanceof java.sql.Time)
+                }
+                if (object instanceof Date || object instanceof java.sql.Date || object instanceof java.sql.Time) {
                     return new SimpleDateFormat(args).format(object);
-                if (object instanceof String )
-                    return this.formatString( (String) object,  args);
-            default: throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
+                }
+                if (object instanceof String) {
+                    return this.formatString((String) object, args);
+                }
+            default:
+                throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
         }
     }
 
     private Object formatString(String content, String transformExpression) throws TemplateException {
         STRING_TRANSFORMATIONS transform = STRING_TRANSFORMATIONS.valueOf(transformExpression.toUpperCase());
-        
-        switch(transform) {
-            case CAMELCASE:
+
+        switch (transform) {
+            case CAMELCASE: {
                 StringBuilder sb = new StringBuilder();
                 String[] trunks = content.split("_");
-                for(String trunk : trunks) {
+                for (String trunk : trunks) {
                     sb.append(String.valueOf(trunk.charAt(0)).toUpperCase());
                     sb.append(trunk.substring(1).toLowerCase());
                 }
                 return sb.toString();
+            }
+            case LOWERCAMELCASE: {
+                StringBuilder sb = new StringBuilder();
+                String[] trunks = content.split("_");
+
+                for (String trunk : trunks) {
+                    sb.append(String.valueOf(trunk.charAt(0)).toUpperCase());
+                    sb.append(trunk.substring(1).toLowerCase());
+                }
+                sb.replace(0, 1, content.substring(0, 1).toLowerCase());
+                return sb.toString();
+            }
             case LOWERCASE:
                 return content.toLowerCase();
             case UPPERCASE:
                 return content.toUpperCase();
-            case METHOD_NAME:   
-                
-            default: throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
+            case METHOD_NAME:
+
+            default:
+                throw new TemplateException("Unknown transform encountered: ?" + transformExpression, template);
         }
-        
+
     }
 
     private String convertPropertyToGetter(String property) {
