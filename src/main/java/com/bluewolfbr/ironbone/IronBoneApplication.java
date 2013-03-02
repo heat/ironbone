@@ -72,6 +72,7 @@ public class IronBoneApplication implements IVisitable {
         ResultSet rs = metadata.getImportedKeys(null, null, tablename);
         while (rs.next()) {
             Column column = new Column(rs.getString("PKCOLUMN_NAME"), null);
+            column.foreignKey = true;
             column.foreignTable = rs.getString("FKTABLE_NAME");
             columns.add(column);
             

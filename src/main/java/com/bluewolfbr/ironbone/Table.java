@@ -25,7 +25,20 @@ public class Table {
         }
         return columns;
     }
-
+    
+    public List<Column> getColumns() {
+        List<Column> columns = new ArrayList<Column>();
+        
+        for(Column c : this.columns) {
+            if(!c.primaryKey)
+                columns.add(c);
+        }
+        return columns;
+    }
+    
+    public Collection<Column> getAllColumns() {
+        return this.columns;
+    }
     public List<Column> getForeignKeys() {
         List<Column> columns = new ArrayList<Column>();
         for (Column c : this.columns) {
@@ -61,7 +74,7 @@ public class Table {
         if (!this.name.toLowerCase().equals(otherTable.name.toLowerCase())) {
             return false;
         }
-
+        
         return true;
     }
 
