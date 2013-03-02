@@ -32,6 +32,13 @@ public class Column {
         }
         return this.type.type;
     }
+    
+    public String getForeignTableOrName() {
+        if(this.foreignKey) {
+            return this.foreignTable;
+        }
+        return this.name;
+    }
     @Override
     public int hashCode() {
         final int prime = 31;
