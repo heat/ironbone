@@ -1,5 +1,7 @@
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.utils.Formatter;
+
 public class Column {
 
     public enum COLUMN_TYPE {
@@ -26,19 +28,37 @@ public class Column {
         this.type = type;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public String getClassName() {
+        return Formatter.toCamelCase(this.name);
+    }
+
+    public String getDbName() {
+        return this.name;
+    }
+
+    public String getVariableName() {
+        return Formatter.toLowerCamelCase(this.name);
+    }
+
+    
     public String getForeignTableOrType() {
-        if(this.foreignKey) {
+        if (this.foreignKey) {
             return this.foreignTable;
         }
         return this.type.type;
     }
-    
+
     public String getForeignTableOrName() {
-        if(this.foreignKey) {
+        if (this.foreignKey) {
             return this.foreignTable;
         }
         return this.name;
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;

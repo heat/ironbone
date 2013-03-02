@@ -1,5 +1,6 @@
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.utils.Formatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,7 +14,22 @@ public class Table {
     public Table(String name) {
         this.name = name;
         columns = new HashSet<Column>();
+    }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDbName() {
+        return this.name;
+    }
+
+    public String getClassName() {
+        return Formatter.toCamelCase(this.name);
+    }
+
+    public String getVariableName() {
+        return Formatter.toLowerCamelCase(this.name);
     }
 
     public List<Column> getPrimaryKeys() {
@@ -25,20 +41,22 @@ public class Table {
         }
         return columns;
     }
-    
+
     public List<Column> getColumns() {
         List<Column> columns = new ArrayList<Column>();
-        
-        for(Column c : this.columns) {
-            if(!c.primaryKey)
+
+        for (Column c : this.columns) {
+            if (!c.primaryKey) {
                 columns.add(c);
+            }
         }
         return columns;
     }
-    
+
     public Collection<Column> getAllColumns() {
         return this.columns;
     }
+
     public List<Column> getForeignKeys() {
         List<Column> columns = new ArrayList<Column>();
         for (Column c : this.columns) {
@@ -49,6 +67,12 @@ public class Table {
         return columns;
     }
 
+    /**
+     * find a column that match the given name.
+     *
+     * @param columnName
+     * @return
+     */
     public Column getColumnByName(String columnName) {
         Column returnColumn = null;
         for (Column column : columns) {
@@ -74,7 +98,7 @@ public class Table {
         if (!this.name.toLowerCase().equals(otherTable.name.toLowerCase())) {
             return false;
         }
-        
+
         return true;
     }
 
