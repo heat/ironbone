@@ -15,7 +15,7 @@
  */
 package com.bluewolfbr.ironbone.template.java;
 
-import com.bluewolfbr.ironbone.IResolver;
+import com.bluewolfbr.ironbone.interfaces.IResolver;
 import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import com.bluewolfbr.ironbone.utils.PropertiesParser;
@@ -23,14 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -68,11 +66,11 @@ public class JavaResolver implements IResolver {
     private void populateTemplateList(String[][] templates) {
         this.templateFileList = Arrays.copyOf(templates, templates.length);
         
-        File templateDir = new File(this.templateDir);
+        File templateDirectory = new File(this.templateDir);
         
         for(int i = 0; i < this.templateFileList.length; i++) {
             String templateName = templateFileList[i][0];
-             File f = new File(templateDir, templateName);
+             File f = new File(templateDirectory, templateName);
              
              if(f.exists()) {
                  templateFileList[i][0] = f.getAbsolutePath();
@@ -85,13 +83,13 @@ public class JavaResolver implements IResolver {
 
     @Override
     public File[] getTemplates() {
-        List<File> templateFileList = new ArrayList<File>();
+        List<File> templateFiles = new ArrayList<File>();
         for(String[] templateData : this.templateFileList) {
             if(templateData[0] != null) {
-                templateFileList.add(new File(templateData[0]));
+                templateFiles.add(new File(templateData[0]));
             }
         }
-        return templateFileList.toArray(new File[]{});
+        return templateFiles.toArray(new File[]{});
     }
 
     @Override
@@ -211,10 +209,10 @@ public class JavaResolver implements IResolver {
 
     @Override
     public Map getContext(File template) {
-        File templateDir = new File(this.templateDir).getAbsoluteFile();
+        File templateDirectory = new File(this.templateDir).getAbsoluteFile();
         File templateParent = template.getAbsoluteFile().getParentFile();
         
-        String realPakcage = templateParent.getAbsolutePath().replace(templateDir.getAbsolutePath(), "").replace(File.separator, ".");
+        String realPakcage = templateParent.getAbsolutePath().replace(templateDirectory.getAbsolutePath(), "").replace(File.separator, ".");
         Map ctx = new HashMap(this.context);
         ctx.put("sourcepackage", this.packageBase + realPakcage);
         

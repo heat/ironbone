@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.models.Column;
+import com.bluewolfbr.ironbone.models.Table;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -29,7 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
-import com.bluewolfbr.ironbone.Column.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.models.Column.COLUMN_TYPE;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -136,7 +138,7 @@ public class IronBoneApplicationTest {
         Table product = app.getTableRef("PRODUTO");
 
         Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
-        assertEquals(primaryKey, product.getPrimaryKeys().get(0));
+        assertEquals(primaryKey, product.getPrimaryKey().get(0));
 
     }
 
@@ -186,7 +188,7 @@ public class IronBoneApplicationTest {
         assertEquals(product.columns, actual.columns);
 
 
-        assertFalse(actual.getPrimaryKeys().isEmpty());
+        assertFalse(actual.getPrimaryKey().isEmpty());
     }
     
     @Test
@@ -195,8 +197,8 @@ public class IronBoneApplicationTest {
         IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
 
         Table actual = app.getTableRef("VENDA");
-        assertFalse(actual.getPrimaryKeys().isEmpty());
-        assertFalse(actual.getForeignKeys().isEmpty());
+        assertFalse(actual.getPrimaryKey().isEmpty());
+        assertFalse(actual.getForeignKey().isEmpty());
     }
     
     @Test

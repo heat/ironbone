@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.models.Column;
+import com.bluewolfbr.ironbone.models.Table;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.sql.Connection;
@@ -54,33 +56,33 @@ public class IronBoneApplication implements IVisitable {
     public Table getTableRef(String tablename) throws SQLException {
         Table ref = new Table(tablename);
         ref.columns.addAll(this.getColumnsRef(tablename));
-        for (Column c : getColumnsPrimaryKey(tablename)) {
+        for (Column c : getPrimaryKeyColumns(tablename)) {
             Column column = ref.getColumnByName(c.name);
             column.primaryKey = true;
         }
 
-        for (Column c : getColumnsForeignKey(tablename)) {
+        for (Column c : getForeignKeyColumns(tablename)) {
             Column column = ref.getColumnByName(c.name);
-            column.foreignTable = c.foreignTable;
+            column.referencedTable = c.referencedTable;
         }
         return ref;
     }
 
-    public List<Column> getColumnsForeignKey(String tablename) throws SQLException {
+    public List<Column> getForeignKeyColumns(String tablename) throws SQLException {
         List<Column> columns = new ArrayList<Column>(0);
         DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getImportedKeys(null, null, tablename);
         while (rs.next()) {
             Column column = new Column(rs.getString("PKCOLUMN_NAME"), null);
             column.foreignKey = true;
-            column.foreignTable = rs.getString("FKTABLE_NAME");
+            column.referencedTable = rs.getString("FKTABLE_NAME");
             columns.add(column);
             
         }
         return columns;
     }
 
-    public List<Column> getColumnsPrimaryKey(String tablename) throws SQLException {
+    public List<Column> getPrimaryKeyColumns(String tablename) throws SQLException {
         List<Column> columns = new ArrayList<Column>(0);
         DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);

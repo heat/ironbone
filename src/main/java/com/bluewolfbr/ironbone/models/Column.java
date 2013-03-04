@@ -1,4 +1,4 @@
-package com.bluewolfbr.ironbone;
+package com.bluewolfbr.ironbone.models;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
 
@@ -19,7 +19,7 @@ public class Column {
     }
     public String name;
     public COLUMN_TYPE type;
-    public String foreignTable = "";
+    public String referencedTable = "";
     public boolean primaryKey = false;
     public boolean foreignKey = false;
 
@@ -44,17 +44,21 @@ public class Column {
         return Formatter.toLowerCamelCase(this.name);
     }
 
-    
-    public String getForeignTableOrType() {
+    /**
+     * retorna a tabela referenciada se for uma columna do tipo FK
+     * ou o  tipo da coluna.
+     * @return 
+     */
+    public String getReferencedType() {
         if (this.foreignKey) {
-            return this.foreignTable;
+            return this.referencedTable;
         }
         return this.type.type;
     }
 
-    public String getForeignTableOrName() {
+    public String getReferencedName() {
         if (this.foreignKey) {
-            return this.foreignTable;
+            return this.referencedTable;
         }
         return this.name;
     }
@@ -99,7 +103,7 @@ public class Column {
     }
 
     @Override
-    protected Column clone() throws CloneNotSupportedException {
+    public Column clone() throws CloneNotSupportedException {
         return new Column(this.name, this.type);
     }
 }

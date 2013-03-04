@@ -1,9 +1,9 @@
-package com.bluewolfbr.ironbone;
+package com.bluewolfbr.ironbone.models;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Table {
@@ -13,7 +13,7 @@ public class Table {
 
     public Table(String name) {
         this.name = name;
-        columns = new HashSet<Column>();
+        columns = new LinkedList<Column>();
     }
 
     public String getName() {
@@ -32,7 +32,7 @@ public class Table {
         return Formatter.toLowerCamelCase(this.name);
     }
 
-    public List<Column> getPrimaryKeys() {
+    public List<Column> getPrimaryKey() {
         List<Column> columns = new ArrayList<Column>();
         for (Column c : this.columns) {
             if (c.primaryKey) {
@@ -42,6 +42,17 @@ public class Table {
         return columns;
     }
 
+    public List<Column> getOwnColumns() {
+        List<Column> columns = new ArrayList<Column>();
+        
+        for (Column c: this.columns) {
+            if(!c.primaryKey && !c.foreignKey) {
+                columns.add(c);
+            }
+        }
+        return columns;
+    }
+    
     public List<Column> getColumns() {
         List<Column> columns = new ArrayList<Column>();
 
@@ -57,16 +68,37 @@ public class Table {
         return this.columns;
     }
 
-    public List<Column> getForeignKeys() {
+    public List<Column> getForeignKey() {
         List<Column> columns = new ArrayList<Column>();
         for (Column c : this.columns) {
-            if (c.foreignTable != null && !c.foreignTable.isEmpty()) {
+            if (c.referencedTable != null && !c.referencedTable.isEmpty()) {
                 columns.add(c);
             }
         }
         return columns;
     }
 
+    /**
+     * retorna se a tabela é composição de outra tabela
+     * @return 
+     */
+    public boolean getComposition() {
+        for(Column c: this.columns){
+            if(c.primaryKey && c.foreignKey) {
+                return true;
+            }
+        } 
+        return false;
+    }
+    
+    /**
+     * @see Table#getComposition() 
+     * @return 
+     */
+    public boolean isComposition() {
+        return getComposition();
+    }
+    
     /**
      * find a column that match the given name.
      *

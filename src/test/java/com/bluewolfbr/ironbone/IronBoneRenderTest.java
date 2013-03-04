@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.models.Column;
+import com.bluewolfbr.ironbone.models.Table;
 import com.bluewolfbr.ironbone.template.java.JavaResolver;
 import java.io.File;
 import java.io.FileInputStream;
