@@ -1,0 +1,52 @@
+package ${package}.bl;
+
+import java.util.Collection;
+
+import org.skife.jdbi.v2.Handle;
+
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+import ${package}.dao.${table.className}Dao;
+import ${package}.model.${table.className};
+
+public class ${table.className}Bl {
+
+	@Inject DBI dbi;
+	
+	public Collection<${table.className}> getAll() {
+		try (Handle handle = dbi.open()) {
+			${table.className}Dao dao = handle.attach(${table.className}Dao.class);
+			return dao.findAll();
+		}
+	}
+	
+	public ${table.className} get([#list table.primaryKey as key]${key.type} ${key.variableName}[/#list separator(",")]) {
+		try (Handle handle = dbi.open()) {
+			${table.className}Dao dao = handle.attach(${table.className}Dao.class);
+			return dao.find([#list table.primaryKey as key]${key.variableName}[/#list separator(",")]);
+		}
+	}
+	
+	public void create(${table.className} ${table.variableName}) {
+		try (Handle handle = dbi.open()) {
+			${table.className}Dao dao = handle.attach(${table.className}Dao.class);
+			dao.insert(${table.variableName});
+		}
+	}
+	
+	public void update([#list table.primaryKey as key]${key.type} ${key.variableName}[/#list separator(",")], ${table.className} ${table.variableName}) {
+		try (Handle handle = dbi.open()) {
+			${table.className}Dao dao = handle.attach(${table.className}Dao.class);
+			dao.update([#list table.primaryKey as key]${key.variableName}[/#list separator(",")], ${table.variableName});
+		}
+	}
+	
+	public void delete([#list table.primaryKey as key]${key.type} ${key.variableName}[/#list separator(",")]) {
+		try (Handle handle = dbi.open()) {
+			${table.className}Dao dao = handle.attach(${table.className}Dao.class);
+			dao.delete([#list table.primaryKey as key]${key.variableName}[/#list separator(",")]);
+		}
+	}
+	
+}
