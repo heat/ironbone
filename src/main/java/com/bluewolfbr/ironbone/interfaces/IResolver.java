@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone;
+package com.bluewolfbr.ironbone.interfaces;
 
+import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import java.io.File;
 import java.util.Map;

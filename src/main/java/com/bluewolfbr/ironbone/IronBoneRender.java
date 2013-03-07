@@ -15,6 +15,9 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.interfaces.IRender;
+import com.bluewolfbr.ironbone.interfaces.IResolver;
+import com.bluewolfbr.ironbone.models.Table;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,7 +29,7 @@ import java.util.Map;
 import no.tornado.template.Template;
 import no.tornado.template.TemplateException;
 
-public class IronBoneRender {
+public class IronBoneRender implements IRender {
 
     private IResolver templateResolver;
 
@@ -41,6 +44,7 @@ public class IronBoneRender {
      * @return
      * @throws Exception 
      */
+    @Override
     public int render(Table data, IResolver resovlerTemplate) throws Exception {
         IronBoneRender render = new IronBoneRender(resovlerTemplate);
         return render.render(data);
@@ -52,6 +56,7 @@ public class IronBoneRender {
      * @return
      * @throws Exception 
      */
+    @Override
     public int render(Table data) throws Exception {
 
         File[] templates = this.templateResolver.getTemplates();

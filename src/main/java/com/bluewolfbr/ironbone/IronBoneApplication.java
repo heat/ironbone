@@ -15,6 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.models.Column;
+import com.bluewolfbr.ironbone.models.Table;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.sql.Connection;
@@ -34,12 +36,13 @@ public class IronBoneApplication implements IVisitable {
     private Connection conn;
     private IronBoneRender renderEngine;
 
-    private IronBoneApplication(){
-        
+    private IronBoneApplication() {
     }
+
     public IronBoneApplication(DatabaseConfig dbconfig, IronBoneRender renderEngine) {
         this(dbconfig.getConnection(), renderEngine);
     }
+
     public IronBoneApplication(Connection conn, IronBoneRender renderEngine) {
         this.conn = conn;
         this.renderEngine = renderEngine;
@@ -52,29 +55,42 @@ public class IronBoneApplication implements IVisitable {
 
     public Table getTableRef(String tablename) throws SQLException {
         Table ref = new Table(tablename);
-        ref.primaryKey = getColumnPrimaryKey(tablename);
         ref.columns.addAll(this.getColumnsRef(tablename));
+        for (Column c : getPrimaryKeyColumns(tablename)) {
+            Column column = ref.getColumnByName(c.name);
+            column.primaryKey = true;
+        }
+
+        for (Column c : getForeignKeyColumns(tablename)) {
+            Column column = ref.getColumnByName(c.name);
+            column.referencedTable = c.referencedTable;
+        }
         return ref;
     }
 
-    public Column getColumnPrimaryKey(String tablename) throws SQLException {
-        Column column = null;
+    public List<Column> getForeignKeyColumns(String tablename) throws SQLException {
+        List<Column> columns = new ArrayList<Column>(0);
+        DatabaseMetaData metadata = conn.getMetaData();
+        ResultSet rs = metadata.getImportedKeys(null, null, tablename);
+        while (rs.next()) {
+            Column column = new Column(rs.getString("PKCOLUMN_NAME"), null);
+            column.foreignKey = true;
+            column.referencedTable = rs.getString("FKTABLE_NAME");
+            columns.add(column);
+            
+        }
+        return columns;
+    }
+
+    public List<Column> getPrimaryKeyColumns(String tablename) throws SQLException {
+        List<Column> columns = new ArrayList<Column>(0);
         DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);
-
-        if (rs.next()) {
-            String columnName = rs.getString("COLUMN_NAME");
-
-            if (!rs.isLast()) {
-                throw new SQLException("Not composite key supported");
-            }
-
-            rs = metadata.getColumns(null, null, tablename, columnName);
-            rs.next();
-            column = resultsetToColumn(rs);
-            return column;
+        while (rs.next()) {
+            columns.add(
+                    new Column(rs.getString("COLUMN_NAME"), null));
         }
-        throw new SQLException("Primary key not found.");
+        return columns;
     }
 
     /**
@@ -113,7 +129,7 @@ public class IronBoneApplication implements IVisitable {
     public static IronBoneApplication getEmptyInstance() {
         return new IronBoneApplication();
     }
-    
+
     @Override
     public void accept(IVisitor visitor) {
         final List<String> properties = new ArrayList<String>();

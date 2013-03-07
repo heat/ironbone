@@ -15,8 +15,9 @@
  */
 package com.bluewolfbr.ironbone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.bluewolfbr.ironbone.models.Column;
+import com.bluewolfbr.ironbone.models.Table;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -28,10 +29,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import com.bluewolfbr.ironbone.Column.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.models.Column.COLUMN_TYPE;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -50,7 +50,18 @@ public class IronBoneApplicationTest {
         String url = "jdbc:hsqldb:mem:data/tutorial";
 
         conn = DriverManager.getConnection(url, "sa", "");
-        String createTable = "DROP TABLE PRODUTO IF EXISTS; CREATE TABLE PRODUTO ( ID INTEGER NOT NULL PRIMARY KEY, NOME VARCHAR(50) NOT NULL, DESCRICAO VARCHAR(50) NOT NULL)";
+        String createTable = "DROP TABLE VENDA IF EXISTS;"
+                + "DROP TABLE PRODUTO IF EXISTS;"
+                + " CREATE TABLE PRODUTO ( "
+                + " ID INTEGER NOT NULL PRIMARY KEY, "
+                + " NOME VARCHAR(50) NOT NULL, "
+                + " DESCRICAO VARCHAR(50) NOT NULL) ;"
+                + " CREATE TABLE VENDA ( "
+                + " ID INTEGER NOT NULL PRIMARY KEY,"
+                + " ID_PRODUTO INTEGER NOT NULL , "
+                + "    FOREIGN KEY (ID_PRODUTO) "
+                + "    REFERENCES PRODUTO(ID) "
+                + " ) ;";
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(createTable);
         stmt.close();
@@ -127,7 +138,7 @@ public class IronBoneApplicationTest {
         Table product = app.getTableRef("PRODUTO");
 
         Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
-        assertEquals(primaryKey, product.primaryKey);
+        assertEquals(primaryKey, product.getPrimaryKey().get(0));
 
     }
 
@@ -137,9 +148,9 @@ public class IronBoneApplicationTest {
     @Test
     public void testTableNameComparison() {
         Table product = new Table("ProducT");
-        product.primaryKey = new Column("NoMe", COLUMN_TYPE.STRING);
+        product.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
         Table other = new Table("PRODUCT");
-        other.primaryKey = new Column("NOME", COLUMN_TYPE.STRING);
+        other.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
 
 
         assertEquals(other, product);
@@ -151,9 +162,10 @@ public class IronBoneApplicationTest {
      */
     public void testGetTableRef() throws SQLException, CloneNotSupportedException {
         Table product = new Table("PRODUTO");
-        product.primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
-        product.columns.add(product.primaryKey);
-        
+        Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
+        primaryKey.primaryKey = true;
+        product.columns.add(primaryKey);
+
         product.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
         product.columns.add(new Column("DESCRICAO", COLUMN_TYPE.STRING));
         IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
@@ -174,8 +186,21 @@ public class IronBoneApplicationTest {
         actual.columns = store;
 
         assertEquals(product.columns, actual.columns);
-    }
 
+
+        assertFalse(actual.getPrimaryKey().isEmpty());
+    }
+    
+    @Test
+    public void getForeignKeyRef() throws SQLException {
+        IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
+        IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
+
+        Table actual = app.getTableRef("VENDA");
+        assertFalse(actual.getPrimaryKey().isEmpty());
+        assertFalse(actual.getForeignKey().isEmpty());
+    }
+    
     @Test
     public void getResourceTemplate() throws URISyntaxException {
         URL file = IronBoneApplication.class

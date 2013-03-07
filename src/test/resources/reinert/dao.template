@@ -1,0 +1,49 @@
+package ${package}.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.sqlobject.Bind;
+import org.skife.jdbi.v2.sqlobject.BindBean;
+import org.skife.jdbi.v2.sqlobject.SqlQuery;
+import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
+
+import ${package}.model.${table.className};
+
+public interface ${table.className}Dao {
+
+	@SqlQuery("SELECT [#list table.allColumns as col]${col.dbName}[/#list separator(",")] FROM ${table.dbName}")
+	@Mapper(${table.className}Mapper.class)
+	Collection<${table.className}> findAll();
+	
+	@SqlQuery("SELECT [#list table.allColumns as col]${col.dbName}[/#list separator(",")] FROM ${table.dbName} WHERE [#list table.primaryKey as key]${key.dbName} = :${key.variableName}[/#list separator(" AND")]")
+	@Mapper(${table.className}Mapper.class)
+	${table.className} find([#list table.primaryKey as key]@Bind("${key.variableName}") ${key.type} ${key.variableName}[/#list separator(",")]);
+
+	@SqlUpdate("INSERT INTO ${table.dbName} ([#list table.allColumns as col]${col.dbName}[/#list separator(",")]) VALUES ([#list table.allColumns as col]:${col.variableName}[/#list separator(",")])")
+	void insert(@BindBean ${table.className} ${table.variableName});
+	
+	@SqlUpdate("UPDATE ${table.dbName} SET [#list table.columns as col]${col.dbName} = :${col.variableName}[/#list separator(",")] WHERE [#list table.primaryKey as key]${key.dbName} = :_${key.variableName}[/#list separator(" AND")]")
+	void update([#list table.primaryKey as key]@Bind("_${key.variableName}") ${key.variableName}[/#list separator(",")], @BindBean ${table.className} ${table.variableName});
+	
+	@SqlUpdate("DELETE FROM ${table.dbName} WHERE [#list table.primaryKey as key]${key.dbName} = :${key.variableName}[/#list separator(" AND")]")
+	void delete([#list table.primaryKey as key]@Bind("${key.variableName}") ${key.type} ${key.variableName}[/#list separator(",")]);	
+	
+	
+	
+	// MAPPERS
+	public static class ${table.className}Mapper implements ResultSetMapper<${table.className}> {
+		public ${table.className} map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+			${table.className} ${table.variableName} = new ${table.className();
+			[#list table.allColumns as col]
+			${table.variableName}.set${col.className}(r.get${col.type}("${col.dbName}"));
+			[/#list]
+			return ${table.variableName};
+		}
+	}
+
+}
