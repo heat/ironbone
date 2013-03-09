@@ -2,7 +2,7 @@ package com.bluewolfbr.ironbone.utils;
 
 import java.sql.Types;
 
-import com.bluewolfbr.ironbone.models.ColumnImpl.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.model.ColumnImpl.COLUMN_TYPE;
 
 public class TransformSQLType {
 

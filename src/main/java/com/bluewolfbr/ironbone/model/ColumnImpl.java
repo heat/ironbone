@@ -1,4 +1,4 @@
-package com.bluewolfbr.ironbone.models;
+package com.bluewolfbr.ironbone.model;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
 

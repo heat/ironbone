@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone.interfaces;
+package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.interfaces.IResolver;
-import com.bluewolfbr.ironbone.models.TableImpl;
+import com.bluewolfbr.ironbone.model.TableImpl;
 
 /**
  *

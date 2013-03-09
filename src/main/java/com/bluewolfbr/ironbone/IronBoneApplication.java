@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.models.ColumnImpl;
-import com.bluewolfbr.ironbone.models.TableImpl;
+import com.bluewolfbr.ironbone.model.ColumnImpl;
+import com.bluewolfbr.ironbone.model.TableImpl;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.sql.Connection;

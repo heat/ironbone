@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.models.ColumnImpl;
-import com.bluewolfbr.ironbone.models.TableImpl;
+import com.bluewolfbr.ironbone.model.ColumnImpl;
+import com.bluewolfbr.ironbone.model.TableImpl;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
-import com.bluewolfbr.ironbone.models.ColumnImpl.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.model.ColumnImpl.COLUMN_TYPE;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -181,7 +181,9 @@ public class IronBoneApplicationTest {
             ColumnImpl columnClone = c.clone();
             actual.columns.add(columnClone);
         }
-        assertEquals(product.columns, actual.columns);
+        
+        assertTrue(product.columns.containsAll(actual.columns));
+        
 
         actual.columns = store;
 
