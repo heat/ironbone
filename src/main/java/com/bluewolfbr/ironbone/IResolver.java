@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone.interfaces;
+package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitable;

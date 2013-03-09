@@ -15,7 +15,6 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.interfaces.IResolver;
 import com.bluewolfbr.ironbone.utils.ContextVisitor;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import com.bluewolfbr.ironbone.utils.PropertiesParser;

@@ -16,7 +16,6 @@
 package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.IRender;
-import com.bluewolfbr.ironbone.interfaces.IResolver;
 import com.bluewolfbr.ironbone.model.TableImpl;
 import java.io.File;
 import java.io.FileWriter;

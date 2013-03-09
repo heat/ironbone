@@ -15,7 +15,7 @@
  */
 package com.bluewolfbr.ironbone.template.java;
 
-import com.bluewolfbr.ironbone.interfaces.IResolver;
+import com.bluewolfbr.ironbone.IResolver;
 import com.bluewolfbr.ironbone.IronBoneConfiguration;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import com.bluewolfbr.ironbone.utils.PropertiesParser;
