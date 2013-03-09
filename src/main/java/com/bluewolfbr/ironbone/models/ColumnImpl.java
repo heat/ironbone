@@ -2,7 +2,7 @@ package com.bluewolfbr.ironbone.models;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
 
-public class Column {
+public class ColumnImpl {
 
     public enum COLUMN_TYPE {
 
@@ -23,7 +23,7 @@ public class Column {
     public boolean primaryKey = false;
     public boolean foreignKey = false;
 
-    public Column(String name, COLUMN_TYPE type) {
+    public ColumnImpl(String name, COLUMN_TYPE type) {
         this.name = name;
         this.type = type;
     }
@@ -83,7 +83,7 @@ public class Column {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Column other = (Column) obj;
+        ColumnImpl other = (ColumnImpl) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -103,7 +103,7 @@ public class Column {
     }
 
     @Override
-    public Column clone() throws CloneNotSupportedException {
-        return new Column(this.name, this.type);
+    public ColumnImpl clone() throws CloneNotSupportedException {
+        return new ColumnImpl(this.name, this.type);
     }
 }

@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.models.Column;
-import com.bluewolfbr.ironbone.models.Table;
+import com.bluewolfbr.ironbone.models.ColumnImpl;
+import com.bluewolfbr.ironbone.models.TableImpl;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import java.sql.Connection;
@@ -49,31 +49,31 @@ public class IronBoneApplication implements IVisitable {
     }
 
     public void run(String tableName) throws Exception {
-        Table table = getTableRef(tableName);
+        TableImpl table = getTableRef(tableName);
         renderEngine.render(table);
     }
 
-    public Table getTableRef(String tablename) throws SQLException {
-        Table ref = new Table(tablename);
+    public TableImpl getTableRef(String tablename) throws SQLException {
+        TableImpl ref = new TableImpl(tablename);
         ref.columns.addAll(this.getColumnsRef(tablename));
-        for (Column c : getPrimaryKeyColumns(tablename)) {
-            Column column = ref.getColumnByName(c.name);
+        for (ColumnImpl c : getPrimaryKeyColumns(tablename)) {
+            ColumnImpl column = ref.getColumnByName(c.name);
             column.primaryKey = true;
         }
 
-        for (Column c : getForeignKeyColumns(tablename)) {
-            Column column = ref.getColumnByName(c.name);
+        for (ColumnImpl c : getForeignKeyColumns(tablename)) {
+            ColumnImpl column = ref.getColumnByName(c.name);
             column.referencedTable = c.referencedTable;
         }
         return ref;
     }
 
-    public List<Column> getForeignKeyColumns(String tablename) throws SQLException {
-        List<Column> columns = new ArrayList<Column>(0);
+    public List<ColumnImpl> getForeignKeyColumns(String tablename) throws SQLException {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>(0);
         DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getImportedKeys(null, null, tablename);
         while (rs.next()) {
-            Column column = new Column(rs.getString("PKCOLUMN_NAME"), null);
+            ColumnImpl column = new ColumnImpl(rs.getString("PKCOLUMN_NAME"), null);
             column.foreignKey = true;
             column.referencedTable = rs.getString("FKTABLE_NAME");
             columns.add(column);
@@ -82,13 +82,13 @@ public class IronBoneApplication implements IVisitable {
         return columns;
     }
 
-    public List<Column> getPrimaryKeyColumns(String tablename) throws SQLException {
-        List<Column> columns = new ArrayList<Column>(0);
+    public List<ColumnImpl> getPrimaryKeyColumns(String tablename) throws SQLException {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>(0);
         DatabaseMetaData metadata = conn.getMetaData();
         ResultSet rs = metadata.getPrimaryKeys(null, null, tablename);
         while (rs.next()) {
             columns.add(
-                    new Column(rs.getString("COLUMN_NAME"), null));
+                    new ColumnImpl(rs.getString("COLUMN_NAME"), null));
         }
         return columns;
     }
@@ -103,9 +103,9 @@ public class IronBoneApplication implements IVisitable {
      * @return Collection of mapped column type
      * @throws SQLException
      */
-    private Collection<Column> getColumnsRef(String tablename)
+    private Collection<ColumnImpl> getColumnsRef(String tablename)
             throws SQLException {
-        Collection<Column> columns = new ArrayList<Column>();
+        Collection<ColumnImpl> columns = new ArrayList<ColumnImpl>();
 
         DatabaseMetaData metadata = conn.getMetaData();
 
@@ -120,8 +120,8 @@ public class IronBoneApplication implements IVisitable {
         return columns;
     }
 
-    private Column resultsetToColumn(ResultSet rs) throws SQLException {
-        Column column = new Column(rs.getString("COLUMN_NAME"),
+    private ColumnImpl resultsetToColumn(ResultSet rs) throws SQLException {
+        ColumnImpl column = new ColumnImpl(rs.getString("COLUMN_NAME"),
                 TransformSQLType.toColumnType(rs.getInt("DATA_TYPE")));
         return column;
     }

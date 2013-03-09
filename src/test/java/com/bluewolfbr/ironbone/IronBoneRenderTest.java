@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.models.Column;
-import com.bluewolfbr.ironbone.models.Table;
+import com.bluewolfbr.ironbone.models.ColumnImpl;
+import com.bluewolfbr.ironbone.models.TableImpl;
 import com.bluewolfbr.ironbone.template.java.JavaResolver;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,12 +55,12 @@ public class IronBoneRenderTest {
     @Test
     public void testRender() throws Exception {
         System.out.println("render");
-        Table data = new Table("PRODUTO");
-        Column primaryKey = new Column("ID", Column.COLUMN_TYPE.LONG);
+        TableImpl data = new TableImpl("PRODUTO");
+        ColumnImpl primaryKey = new ColumnImpl("ID", ColumnImpl.COLUMN_TYPE.LONG);
         primaryKey.primaryKey = true;
         data.columns.add(primaryKey);
-        data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
-        data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("NOME", ColumnImpl.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("DESCRICAO", ColumnImpl.COLUMN_TYPE.STRING));
         IronBoneRender instance = new IronBoneRender(new JavaResolver());
         int expResult = 0;
         int result = instance.render(data);
@@ -70,12 +70,12 @@ public class IronBoneRenderTest {
     @Test
     public void testRenderResolverConfig() throws Exception {
         System.out.println("render");
-        Table data = new Table("PRODUCT_MARVEN");
-        Column primaryKey = new Column("ID", Column.COLUMN_TYPE.LONG);
+        TableImpl data = new TableImpl("PRODUCT_MARVEN");
+        ColumnImpl primaryKey = new ColumnImpl("ID", ColumnImpl.COLUMN_TYPE.LONG);
         primaryKey.primaryKey = true;
         data.columns.add(primaryKey);
-        data.columns.add(new Column("NAME", Column.COLUMN_TYPE.STRING));
-        data.columns.add(new Column("DESCRIPTION", Column.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("NAME", ColumnImpl.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("DESCRIPTION", ColumnImpl.COLUMN_TYPE.STRING));
         IronBoneConfiguration properties = readYamlFile(
                 new File(this.getClass().getResource("config.yml").toURI()));
 
@@ -95,12 +95,12 @@ public class IronBoneRenderTest {
     @Test
     public void testeRenderResolver() throws Exception {
         System.out.println("render");
-        Table data = new Table("PRODUTO");
-        Column primaryKey = new Column("ID", Column.COLUMN_TYPE.LONG);
+        TableImpl data = new TableImpl("PRODUTO");
+        ColumnImpl primaryKey = new ColumnImpl("ID", ColumnImpl.COLUMN_TYPE.LONG);
         primaryKey.primaryKey = true;
         data.columns.add(primaryKey);
-        data.columns.add(new Column("NOME", Column.COLUMN_TYPE.STRING));
-        data.columns.add(new Column("DESCRICAO", Column.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("NOME", ColumnImpl.COLUMN_TYPE.STRING));
+        data.columns.add(new ColumnImpl("DESCRICAO", ColumnImpl.COLUMN_TYPE.STRING));
         IronBoneRender instance = new IronBoneRender(new JavaResolver());
 
 

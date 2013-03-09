@@ -15,8 +15,8 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.models.Column;
-import com.bluewolfbr.ironbone.models.Table;
+import com.bluewolfbr.ironbone.models.ColumnImpl;
+import com.bluewolfbr.ironbone.models.TableImpl;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
-import com.bluewolfbr.ironbone.models.Column.COLUMN_TYPE;
+import com.bluewolfbr.ironbone.models.ColumnImpl.COLUMN_TYPE;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -135,9 +135,9 @@ public class IronBoneApplicationTest {
         IronBoneRender render = Mockito.mock(IronBoneRender.class);
         IronBoneApplication app = new IronBoneApplication(conn, render);
 
-        Table product = app.getTableRef("PRODUTO");
+        TableImpl product = app.getTableRef("PRODUTO");
 
-        Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
+        ColumnImpl primaryKey = new ColumnImpl("ID", COLUMN_TYPE.INTEGER);
         assertEquals(primaryKey, product.getPrimaryKey().get(0));
 
     }
@@ -147,10 +147,10 @@ public class IronBoneApplicationTest {
      */
     @Test
     public void testTableNameComparison() {
-        Table product = new Table("ProducT");
-        product.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
-        Table other = new Table("PRODUCT");
-        other.columns.add(new Column("NoMe", COLUMN_TYPE.STRING));
+        TableImpl product = new TableImpl("ProducT");
+        product.columns.add(new ColumnImpl("NoMe", COLUMN_TYPE.STRING));
+        TableImpl other = new TableImpl("PRODUCT");
+        other.columns.add(new ColumnImpl("NoMe", COLUMN_TYPE.STRING));
 
 
         assertEquals(other, product);
@@ -161,24 +161,24 @@ public class IronBoneApplicationTest {
      * test the read metadata product table and her representation
      */
     public void testGetTableRef() throws SQLException, CloneNotSupportedException {
-        Table product = new Table("PRODUTO");
-        Column primaryKey = new Column("ID", COLUMN_TYPE.INTEGER);
+        TableImpl product = new TableImpl("PRODUTO");
+        ColumnImpl primaryKey = new ColumnImpl("ID", COLUMN_TYPE.INTEGER);
         primaryKey.primaryKey = true;
         product.columns.add(primaryKey);
 
-        product.columns.add(new Column("NOME", COLUMN_TYPE.STRING));
-        product.columns.add(new Column("DESCRICAO", COLUMN_TYPE.STRING));
+        product.columns.add(new ColumnImpl("NOME", COLUMN_TYPE.STRING));
+        product.columns.add(new ColumnImpl("DESCRICAO", COLUMN_TYPE.STRING));
         IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
         IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
 
-        Table actual = app.getTableRef("PRODUTO");
+        TableImpl actual = app.getTableRef("PRODUTO");
 
         assertEquals(product, actual);
 
-        Collection<Column> store = actual.columns;
-        actual.columns = new HashSet<Column>();
-        for (Column c : product.columns) {
-            Column columnClone = c.clone();
+        Collection<ColumnImpl> store = actual.columns;
+        actual.columns = new HashSet<ColumnImpl>();
+        for (ColumnImpl c : product.columns) {
+            ColumnImpl columnClone = c.clone();
             actual.columns.add(columnClone);
         }
         assertEquals(product.columns, actual.columns);
@@ -196,7 +196,7 @@ public class IronBoneApplicationTest {
         IronBoneRender renderEngine = Mockito.mock(IronBoneRender.class);
         IronBoneApplication app = new IronBoneApplication(conn, renderEngine);
 
-        Table actual = app.getTableRef("VENDA");
+        TableImpl actual = app.getTableRef("VENDA");
         assertFalse(actual.getPrimaryKey().isEmpty());
         assertFalse(actual.getForeignKey().isEmpty());
     }

@@ -6,14 +6,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Table {
+public class TableImpl {
 
     public String name;
-    public Collection<Column> columns;
+    public Collection<ColumnImpl> columns;
 
-    public Table(String name) {
+    public TableImpl(String name) {
         this.name = name;
-        columns = new LinkedList<Column>();
+        columns = new LinkedList<ColumnImpl>();
     }
 
     public String getName() {
@@ -32,9 +32,9 @@ public class Table {
         return Formatter.toLowerCamelCase(this.name);
     }
 
-    public List<Column> getPrimaryKey() {
-        List<Column> columns = new ArrayList<Column>();
-        for (Column c : this.columns) {
+    public List<ColumnImpl> getPrimaryKey() {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>();
+        for (ColumnImpl c : this.columns) {
             if (c.primaryKey) {
                 columns.add(c);
             }
@@ -42,10 +42,10 @@ public class Table {
         return columns;
     }
 
-    public List<Column> getOwnColumns() {
-        List<Column> columns = new ArrayList<Column>();
+    public List<ColumnImpl> getOwnColumns() {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>();
         
-        for (Column c: this.columns) {
+        for (ColumnImpl c: this.columns) {
             if(!c.primaryKey && !c.foreignKey) {
                 columns.add(c);
             }
@@ -53,10 +53,10 @@ public class Table {
         return columns;
     }
     
-    public List<Column> getColumns() {
-        List<Column> columns = new ArrayList<Column>();
+    public List<ColumnImpl> getColumns() {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>();
 
-        for (Column c : this.columns) {
+        for (ColumnImpl c : this.columns) {
             if (!c.primaryKey) {
                 columns.add(c);
             }
@@ -64,13 +64,13 @@ public class Table {
         return columns;
     }
 
-    public Collection<Column> getAllColumns() {
+    public Collection<ColumnImpl> getAllColumns() {
         return this.columns;
     }
 
-    public List<Column> getForeignKey() {
-        List<Column> columns = new ArrayList<Column>();
-        for (Column c : this.columns) {
+    public List<ColumnImpl> getForeignKey() {
+        List<ColumnImpl> columns = new ArrayList<ColumnImpl>();
+        for (ColumnImpl c : this.columns) {
             if (c.referencedTable != null && !c.referencedTable.isEmpty()) {
                 columns.add(c);
             }
@@ -83,7 +83,7 @@ public class Table {
      * @return 
      */
     public boolean getComposition() {
-        for(Column c: this.columns){
+        for(ColumnImpl c: this.columns){
             if(c.primaryKey && c.foreignKey) {
                 return true;
             }
@@ -105,9 +105,9 @@ public class Table {
      * @param columnName
      * @return
      */
-    public Column getColumnByName(String columnName) {
-        Column returnColumn = null;
-        for (Column column : columns) {
+    public ColumnImpl getColumnByName(String columnName) {
+        ColumnImpl returnColumn = null;
+        for (ColumnImpl column : columns) {
             if (column.name.equals(columnName)) {
                 returnColumn = column;
                 break;
@@ -125,7 +125,7 @@ public class Table {
             return false;
         }
 
-        Table otherTable = (Table) other;
+        TableImpl otherTable = (TableImpl) other;
 
         if (!this.name.toLowerCase().equals(otherTable.name.toLowerCase())) {
             return false;

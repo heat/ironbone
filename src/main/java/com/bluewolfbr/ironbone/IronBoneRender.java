@@ -17,7 +17,7 @@ package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.interfaces.IRender;
 import com.bluewolfbr.ironbone.interfaces.IResolver;
-import com.bluewolfbr.ironbone.models.Table;
+import com.bluewolfbr.ironbone.models.TableImpl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class IronBoneRender implements IRender {
      * @throws Exception 
      */
     @Override
-    public int render(Table data, IResolver resovlerTemplate) throws Exception {
+    public int render(TableImpl data, IResolver resovlerTemplate) throws Exception {
         IronBoneRender render = new IronBoneRender(resovlerTemplate);
         return render.render(data);
     }
@@ -57,7 +57,7 @@ public class IronBoneRender implements IRender {
      * @throws Exception 
      */
     @Override
-    public int render(Table data) throws Exception {
+    public int render(TableImpl data) throws Exception {
 
         File[] templates = this.templateResolver.getTemplates();
         List<File> outputFileList = new ArrayList<File>();
@@ -84,7 +84,7 @@ public class IronBoneRender implements IRender {
      * @throws IOException
      * @throws TemplateException 
      */
-    private File render(File template, Table data) throws IOException, TemplateException {
+    private File render(File template, TableImpl data) throws IOException, TemplateException {
         Map ctx = new HashMap();
         File outputFile = null;
         ctx.put("table", data);
