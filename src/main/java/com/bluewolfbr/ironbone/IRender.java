@@ -15,7 +15,7 @@
  */
 package com.bluewolfbr.ironbone;
 
-import com.bluewolfbr.ironbone.model.TableImpl;
+import com.bluewolfbr.ironbone.model.Table;
 
 /**
  *
@@ -30,7 +30,7 @@ public interface IRender {
      * @return
      * @throws Exception
      */
-    int render(TableImpl data, IResolver resovlerTemplate) throws Exception;
+    int render(Table data, IResolver resovlerTemplate) throws Exception;
 
     /**
      * This method start the render process
@@ -38,6 +38,6 @@ public interface IRender {
      * @return
      * @throws Exception
      */
-    int render(TableImpl data) throws Exception;
+    int render(Table data) throws Exception;
     
 }

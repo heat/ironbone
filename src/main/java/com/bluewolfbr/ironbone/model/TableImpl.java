@@ -1,20 +1,17 @@
 package com.bluewolfbr.ironbone.model;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TableImpl implements Table {
 
-    public String name;
-    public List<Column> columns;
+    private final String name;
+    private final List<Column> columns;
 
-    public TableImpl(String name) {
+    public TableImpl(String name, List<Column> columns) {
         this.name = name;
-        columns = new LinkedList<Column>();
+        this.columns = columns;
     }
 
     /**

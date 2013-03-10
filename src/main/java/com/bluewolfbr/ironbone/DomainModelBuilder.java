@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone.model;
+package com.bluewolfbr.ironbone;
 
-public interface Column {
-
-	// Fields
-	String getDbName();
-	String getCamelName();
-	String getFieldName();
-	String getType();
-	
-        boolean isPrimaryKey();
-        boolean isForeignKey();
-        Table getReferencedTable(); 
+/**
+ *
+ * @author OnezinoGabriel
+ */
+public abstract class DomainModelBuilder {
+    
+        
+    public static TableBuilder getTableBuilder() {
+        return new TableBuilder();
+    }
 }

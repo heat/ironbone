@@ -15,7 +15,9 @@
  */
 package com.bluewolfbr.ironbone;
 
+import com.bluewolfbr.ironbone.model.Column;
 import com.bluewolfbr.ironbone.model.ColumnImpl;
+import com.bluewolfbr.ironbone.model.Table;
 import com.bluewolfbr.ironbone.model.TableImpl;
 import com.bluewolfbr.ironbone.utils.IVisitable;
 import com.bluewolfbr.ironbone.utils.IVisitor;
@@ -49,14 +51,15 @@ public class IronBoneApplication implements IVisitable {
     }
 
     public void run(String tableName) throws Exception {
-        TableImpl table = getTableRef(tableName);
+        Table table = getTableRef(tableName);
         renderEngine.render(table);
     }
 
-    public TableImpl getTableRef(String tablename) throws SQLException {
-        TableImpl ref = new TableImpl(tablename);
-        ref.columns.addAll(this.getColumnsRef(tablename));
-        return ref;
+    public Table getTableRef(String tablename) throws SQLException {
+        TableBuilder tb= DomainModelBuilder.getTableBuilder();
+        Table table = tb.buildTable(tablename, "","").setClassName("Nome da Classe").setColumns(
+                 this.getColumnsRef(tablename)).getResult();
+        return table;
     }
 
     public List<ColumnImpl> getForeignKeyColumns(String tablename) throws SQLException {
@@ -96,18 +99,18 @@ public class IronBoneApplication implements IVisitable {
      * @return Collection of mapped column type
      * @throws SQLException
      */
-    private Collection<ColumnImpl> getColumnsRef(String tablename)
+    private List<Column> getColumnsRef(String tablename)
             throws SQLException {
-        Collection<ColumnImpl> columns = new ArrayList<ColumnImpl>();
+        List<Column> columns = new ArrayList<Column>();
 
         DatabaseMetaData metadata = conn.getMetaData();
 
         ResultSet rs = metadata.getColumns(null, null, tablename, null);
 
-        while (rs.next()) {
-            columns.add(resultsetToColumn(rs));
-        }
         if (rs != null) {
+            while (rs.next()) {
+                columns.add(resultsetToColumn(rs));
+            }
             rs.close();
         }
         return columns;

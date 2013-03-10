@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluewolfbr.ironbone.model;
+package com.bluewolfbr.ironbone;
 
-public interface Column {
+/**
+ *
+ * @author OnezinoGabriel
+ */
+class TableDao {
+    private static TableDao instance;
+            
+    static TableDao getInstance() {
+        if (TableDao.instance == null) {
+            TableDao.instance = getDao();
+        }
+        
+        return TableDao.instance;
+    }
 
-	// Fields
-	String getDbName();
-	String getCamelName();
-	String getFieldName();
-	String getType();
-	
-        boolean isPrimaryKey();
-        boolean isForeignKey();
-        Table getReferencedTable(); 
+    private static TableDao getDao() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

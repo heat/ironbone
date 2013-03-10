@@ -20,7 +20,7 @@ public class ColumnImpl implements Column {
     }
     private String name;
     private COLUMN_TYPE type;
-    private String referencedTable = "";
+    private Table referencedTable;
     private boolean primaryKey = false;
     private boolean foreignKey = false;
 
@@ -29,7 +29,7 @@ public class ColumnImpl implements Column {
         this.type = type;
     }
 
-    public ColumnImpl(String name, COLUMN_TYPE type, boolean isPk, boolean isFk, String referencedTable) {
+    public ColumnImpl(String name, COLUMN_TYPE type, boolean isPk, boolean isFk, Table referencedTable) {
         this(name, type);
         this.primaryKey = isPk;
         this.foreignKey = isFk;
@@ -54,6 +54,21 @@ public class ColumnImpl implements Column {
     @Override
     public String getType() {
         return this.type.toString();
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return this.primaryKey;
+    }
+
+    @Override
+    public boolean isForeignKey() {
+        return this.foreignKey;
+    }
+
+    @Override
+    public Table getReferencedTable() {
+        return this.referencedTable;
     }
 
     @Override
