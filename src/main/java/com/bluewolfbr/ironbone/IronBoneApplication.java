@@ -56,30 +56,23 @@ public class IronBoneApplication implements IVisitable {
     public TableImpl getTableRef(String tablename) throws SQLException {
         TableImpl ref = new TableImpl(tablename);
         ref.columns.addAll(this.getColumnsRef(tablename));
-        for (ColumnImpl c : getPrimaryKeyColumns(tablename)) {
-            ColumnImpl column = ref.getColumnByName(c.name);
-            column.primaryKey = true;
-        }
-
-        for (ColumnImpl c : getForeignKeyColumns(tablename)) {
-            ColumnImpl column = ref.getColumnByName(c.name);
-            column.referencedTable = c.referencedTable;
-        }
         return ref;
     }
 
     public List<ColumnImpl> getForeignKeyColumns(String tablename) throws SQLException {
-        List<ColumnImpl> columns = new ArrayList<ColumnImpl>(0);
-        DatabaseMetaData metadata = conn.getMetaData();
-        ResultSet rs = metadata.getImportedKeys(null, null, tablename);
-        while (rs.next()) {
-            ColumnImpl column = new ColumnImpl(rs.getString("PKCOLUMN_NAME"), null);
-            column.foreignKey = true;
-            column.referencedTable = rs.getString("FKTABLE_NAME");
-            columns.add(column);
+        return new ArrayList<ColumnImpl>(0);
+        /*List<ColumnImpl> columns = new ArrayList<ColumnImpl>(0);
+         DatabaseMetaData metadata = conn.getMetaData();
+         ResultSet rs = metadata.getImportedKeys(null, null, tablename);
+         while (rs.next()) {
+         ColumnImpl column = new ColumnImpl(rs.getString("PKCOLUMN_NAME"), null);
+         column.foreignKey = true;
+         column.referencedTable = rs.getString("FKTABLE_NAME");
+         columns.add(column);
             
-        }
-        return columns;
+         }
+         return columns;
+         */
     }
 
     public List<ColumnImpl> getPrimaryKeyColumns(String tablename) throws SQLException {

@@ -16,7 +16,12 @@
 package com.bluewolfbr.ironbone;
 
 import com.bluewolfbr.ironbone.utils.PropertiesParser;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import no.tornado.template.TemplateException;
+import org.yaml.snakeyaml.Yaml;
 
 public class IronBoneConfiguration {
 
@@ -52,5 +57,25 @@ public class IronBoneConfiguration {
                 PropertiesParser.parser(this.config.resolver.sourcepackage);
         this.config.resolver.templatedir = 
                 PropertiesParser.parser(this.config.resolver.templatedir);
+    }
+    
+    public static IronBoneConfiguration loadConfiguration(String filename) {
+        String yamlConfigFile = "";
+        String tableName = "";
+        File yamlFile;
+        InputStream is;
+        IronBoneConfiguration configuration = null;
+        Yaml yaml = new Yaml();
+        yamlFile = new File(yamlConfigFile);
+        if (!yamlFile.exists()) {
+            throw new RuntimeException("arquivo de configuração faltando");
+        }
+        try{
+        is = new FileInputStream(yamlFile);
+        configuration = yaml.loadAs(is, IronBoneConfiguration.class);
+        }catch(FileNotFoundException e) {
+            
+        }
+        return configuration;
     }
 }

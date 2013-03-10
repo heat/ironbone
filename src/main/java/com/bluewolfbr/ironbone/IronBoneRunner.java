@@ -19,8 +19,6 @@ import com.bluewolfbr.ironbone.utils.ContextVisitor;
 import com.bluewolfbr.ironbone.utils.IVisitor;
 import com.bluewolfbr.ironbone.utils.PropertiesParser;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
@@ -31,7 +29,6 @@ public class IronBoneRunner {
     IVisitor contextVisitor = new ContextVisitor();
 
     public void run(IronBoneConfiguration configuration, String tableName) throws Exception {
-        System.out.println("runnig at " + new File("null").getAbsoluteFile().getParent());
         //start visiting de IBApplication
         IronBoneApplication.getEmptyInstance().accept(contextVisitor);
         //Recover the resolver class and visit it
@@ -41,18 +38,11 @@ public class IronBoneRunner {
         //after all visits parse the configuration
         configuration.parser();
         Yaml yaml = new Yaml();
-        System.out.println(Arrays.toString(PropertiesParser.applicationContext.keySet().toArray()));
-        System.out.println(Arrays.toString(PropertiesParser.applicationContext.values().toArray()));
-        System.out.println("Current configuration:\n" + yaml.dumpAs(configuration, Tag.YAML, FlowStyle.BLOCK));        
         //after that initialize it
         resolverDriver.build(configuration.config.resolver);
 
-
         DatabaseConfig dbconfig = new DatabaseConfig(configuration);
-
-
         IronBoneRender render = new IronBoneRender(resolverDriver);
-
         IronBoneApplication app = new IronBoneApplication(dbconfig, render);
 
         app.run(tableName);
@@ -60,38 +50,29 @@ public class IronBoneRunner {
 
     public static void main(String[] args) throws Exception {
         IronBoneRunner runner = new IronBoneRunner();
+        IronBoneConfiguration configuration = null;
         String yamlConfigFile = "";
         String tableName = "";
-        File yamlFile;
-        InputStream is;
-        IronBoneConfiguration configuration;
-        Yaml yaml = new Yaml();
-        
         if (args.length == 2) {
             yamlConfigFile = args[0];
             tableName = args[1];
-            
-            if(args[0].equals("--generate")){
-                
+
+            if (args[0].equals("--generate")) {
                 runner.generateDefaultFiles(args[0], args[1]);
                 return;
             }
         } else {
             throw new RuntimeException("numero de parametros incorreto");
         }
-        yamlFile = new File(yamlConfigFile);
-        if (!yamlFile.exists()) {
-            throw new RuntimeException("arquivo de configuração faltando");
-        }
-        is = new FileInputStream(yamlFile);
-        configuration = yaml.loadAs(is, IronBoneConfiguration.class);
+
         runner.run(configuration, tableName);
     }
 
-    private void generateDefaultFiles(String cmd, String driver){
+    private void generateDefaultFiles(String cmd, String driver) {
         IResolver resolverDriver = loadResolverDriver(driver);
         resolverDriver.generate();
     }
+
     private IResolver loadResolverDriver(String driver) {
         IResolver obj = null;
         try {

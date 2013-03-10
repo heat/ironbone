@@ -2,7 +2,7 @@ package com.bluewolfbr.ironbone.model;
 
 import com.bluewolfbr.ironbone.utils.Formatter;
 
-public class ColumnImpl {
+public class ColumnImpl implements Column {
 
     public enum COLUMN_TYPE {
 
@@ -13,54 +13,47 @@ public class ColumnImpl {
             this.type = type;
         }
 
+        @Override
         public String toString() {
             return this.type;
         }
     }
-    public String name;
-    public COLUMN_TYPE type;
-    public String referencedTable = "";
-    public boolean primaryKey = false;
-    public boolean foreignKey = false;
+    private String name;
+    private COLUMN_TYPE type;
+    private String referencedTable = "";
+    private boolean primaryKey = false;
+    private boolean foreignKey = false;
 
     public ColumnImpl(String name, COLUMN_TYPE type) {
         this.name = name;
         this.type = type;
     }
 
-    public String getName() {
-        return this.name;
+    public ColumnImpl(String name, COLUMN_TYPE type, boolean isPk, boolean isFk, String referencedTable) {
+        this(name, type);
+        this.primaryKey = isPk;
+        this.foreignKey = isFk;
+        this.referencedTable = referencedTable;
     }
 
-    public String getClassName() {
-        return Formatter.toCamelCase(this.name);
-    }
-
+    @Override
     public String getDbName() {
         return this.name;
     }
 
-    public String getVariableName() {
+    @Override
+    public String getCamelName() {
+        return Formatter.toCamelCase(this.name);
+    }
+
+    @Override
+    public String getFieldName() {
         return Formatter.toLowerCamelCase(this.name);
     }
 
-    /**
-     * retorna a tabela referenciada se for uma columna do tipo FK
-     * ou o  tipo da coluna.
-     * @return 
-     */
-    public String getReferencedType() {
-        if (this.foreignKey) {
-            return this.referencedTable;
-        }
-        return this.type.type;
-    }
-
-    public String getReferencedName() {
-        if (this.foreignKey) {
-            return this.referencedTable;
-        }
-        return this.name;
+    @Override
+    public String getType() {
+        return this.type.toString();
     }
 
     @Override
@@ -99,7 +92,7 @@ public class ColumnImpl {
 
     @Override
     public String toString() {
-        return "" + this.name + "";
+        return "ColumnImpl{" + "name=" + name + ", type=" + type + ", referencedTable=" + referencedTable + ", primaryKey=" + primaryKey + ", foreignKey=" + foreignKey + '}';
     }
 
     @Override
